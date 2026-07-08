@@ -1,0 +1,42 @@
+# ==============================
+# DESTEOR — Root .gitignore
+# ==============================
+
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Environment variables (never commit secrets)
+.env
+.env.local
+.env.*.local
+client/.env
+server/.env
+
+# Build outputs
+client/dist/
+client/build/
+server/dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Prisma
+server/prisma/*.db
+server/prisma/migrations/dev.db
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Testing / coverage
+coverage/
+
+# Vite cache
+client/.vite/
