@@ -15,11 +15,16 @@ export const ROUTES = {
   PRODUCT_DETAILS: '/shop/:slug',
   ABOUT: '/about',
   CONTACT: '/contact',
+  LOGIN: '/login',
+  REGISTER: '/register',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password/:token',
 
   AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
-    FORGOT_PASSWORD: '/auth/forgot-password',
+    LOGIN: '/login',
+    REGISTER: '/register',
+    FORGOT_PASSWORD: '/forgot-password',
+    RESET_PASSWORD: '/reset-password/:token',
   },
 
   ADMIN: {

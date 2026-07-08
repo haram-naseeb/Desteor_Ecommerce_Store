@@ -34,9 +34,26 @@ const env = {
   PORT: parseInt(process.env.PORT, 10) || 5000,
   DATABASE_URL: process.env.DATABASE_URL,
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173',
+  JWT_ACCESS_SECRET:
+    process.env.JWT_ACCESS_SECRET || 'desteor-development-access-secret',
+  JWT_REFRESH_SECRET:
+    process.env.JWT_REFRESH_SECRET || 'desteor-development-refresh-secret',
+  JWT_ACCESS_EXPIRES_IN: process.env.JWT_ACCESS_EXPIRES_IN || '15m',
+  JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+  RESET_TOKEN_EXPIRES_MINUTES:
+    parseInt(process.env.RESET_TOKEN_EXPIRES_MINUTES, 10) || 30,
 
   isProduction: () => env.NODE_ENV === 'production',
   isDevelopment: () => env.NODE_ENV === 'development',
 };
+
+if (
+  env.isProduction() &&
+  (!process.env.JWT_ACCESS_SECRET || !process.env.JWT_REFRESH_SECRET)
+) {
+  throw new Error(
+    'JWT_ACCESS_SECRET and JWT_REFRESH_SECRET are required in production.'
+  );
+}
 
 module.exports = env;

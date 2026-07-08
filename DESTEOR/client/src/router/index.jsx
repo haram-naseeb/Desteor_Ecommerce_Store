@@ -3,6 +3,10 @@ import { createBrowserRouter } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
 import AuthLayout from '@/layouts/AuthLayout';
 import AdminLayout from '@/layouts/AdminLayout';
+import ForgotPassword from '@/pages/ForgotPassword';
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
+import ResetPassword from '@/pages/ResetPassword';
 import About from '@/pages/public/About';
 import Contact from '@/pages/public/Contact';
 import Home from '@/pages/public/Home';
@@ -49,9 +53,26 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: '/auth',
+    path: '/',
     element: <AuthLayout />,
-    children: [],
+    children: [
+      {
+        path: 'login',
+        element: <Login />,
+      },
+      {
+        path: 'register',
+        element: <Register />,
+      },
+      {
+        path: 'forgot-password',
+        element: <ForgotPassword />,
+      },
+      {
+        path: 'reset-password/:token',
+        element: <ResetPassword />,
+      },
+    ],
   },
   {
     path: '/admin',
