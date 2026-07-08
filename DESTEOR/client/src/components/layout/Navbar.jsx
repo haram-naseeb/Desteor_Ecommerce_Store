@@ -4,6 +4,7 @@ import { Link, NavLink } from 'react-router-dom';
 
 import { APP_NAME } from '@/constants/app';
 import { ROUTES } from '@/constants/routes';
+import { useAuth } from '@/hooks/useAuth';
 
 const navItems = [
   { label: 'Home', to: ROUTES.HOME },
@@ -14,11 +15,31 @@ const navItems = [
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { currentUser, isAuthenticated, logout } = useAuth();
 
   const linkClass = ({ isActive }) =>
     `text-sm font-medium uppercase tracking-[0.22em] transition-colors ${
       isActive ? 'text-champagne-gold' : 'text-ivory-white/78 hover:text-champagne-gold'
     }`;
+
+  const closeMenu = () => setIsOpen(false);
+
+  const handleLogout = async () => {
+    await logout();
+    closeMenu();
+  };
+
+  const authLinks = isAuthenticated
+    ? [
+        {
+          label: currentUser?.firstName ? `Profile` : 'Profile',
+          to: ROUTES.PROFILE,
+        },
+      ]
+    : [
+        { label: 'Login', to: ROUTES.LOGIN },
+        { label: 'Register', to: ROUTES.REGISTER },
+      ];
 
   return (
     <header className="sticky top-0 z-50 border-b border-ivory-white/10 bg-matte-black/95 backdrop-blur">
@@ -38,6 +59,20 @@ function Navbar() {
               {item.label}
             </NavLink>
           ))}
+          {authLinks.map((item) => (
+            <NavLink key={item.label} to={item.to} className={linkClass}>
+              {item.label}
+            </NavLink>
+          ))}
+          {isAuthenticated && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="text-sm font-medium uppercase tracking-[0.22em] text-ivory-white/78 transition-colors hover:text-champagne-gold"
+            >
+              Logout
+            </button>
+          )}
         </div>
 
         <button
@@ -59,11 +94,30 @@ function Navbar() {
                 key={item.to}
                 to={item.to}
                 className={linkClass}
-                onClick={() => setIsOpen(false)}
+                onClick={closeMenu}
               >
                 {item.label}
               </NavLink>
             ))}
+            {authLinks.map((item) => (
+              <NavLink
+                key={item.label}
+                to={item.to}
+                className={linkClass}
+                onClick={closeMenu}
+              >
+                {item.label}
+              </NavLink>
+            ))}
+            {isAuthenticated && (
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="text-left text-sm font-medium uppercase tracking-[0.22em] text-ivory-white/78 transition-colors hover:text-champagne-gold"
+              >
+                Logout
+              </button>
+            )}
           </div>
         </div>
       )}

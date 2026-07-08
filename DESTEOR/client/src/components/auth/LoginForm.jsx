@@ -30,7 +30,9 @@ function LoginForm() {
     try {
       await login(values);
       setSuccess('Welcome back to DESTEOR.');
-      const redirectTo = location.state?.from?.pathname || ROUTES.HOME;
+      const redirectTo = `${location.state?.from?.pathname || ROUTES.HOME}${
+        location.state?.from?.search || ''
+      }`;
       navigate(redirectTo, { replace: true });
     } catch (error) {
       setFormError(error.message);

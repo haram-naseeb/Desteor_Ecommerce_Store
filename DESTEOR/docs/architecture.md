@@ -26,6 +26,25 @@ Route → Controller → Service → Repository → Prisma → PostgreSQL
 
 **Rule:** Controllers never contain business logic. Services never touch `req`/`res`. Only repositories import the Prisma client.
 
+## Sprint 4 Catalog
+
+Product catalog data is now database-backed through Prisma and PostgreSQL.
+The catalog domain follows the same backend layering:
+
+```
+catalog.routes -> catalog.controller -> catalog.service -> catalog.repository -> Prisma
+```
+
+The catalog schema includes `Category`, `Collection`, `Product`,
+`ProductImage`, and `ProductSpecification`. Categories and collections are
+shared taxonomy records. Product images and specifications are owned by a
+product and cascade on product deletion. Category and collection deletion is
+restricted while products still reference them.
+
+Public storefront browsing remains unauthenticated. Authentication is only
+required when a customer starts a purchase intent, such as Product Details'
+`Buy Now` action.
+
 ---
 
 ## Frontend Structure
@@ -34,8 +53,9 @@ Route → Controller → Service → Repository → Prisma → PostgreSQL
 |---|---|
 | `components/ui/` | Purely presentational, reusable components (Button, Card, Modal, etc.) with no business logic and no knowledge of specific features. |
 | `layouts/` | Page shells (`MainLayout`, `AuthLayout`, `AdminLayout`) that define consistent structure per section of the app. |
-| `config/` | Centralized configuration: API client instance, theme tokens. |
+| `config/` | Centralized configuration: API base values and theme tokens. |
 | `constants/` | Shared, static values used across the app (routes, roles, etc.). |
+| `services/` | Feature API adapters that call the shared Axios instance and normalize API payloads for pages/components. |
 
 Pages (added in later sprints) compose layouts + UI components + feature-specific logic. They are the only layer allowed to know about specific business features.
 

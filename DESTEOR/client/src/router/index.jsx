@@ -3,8 +3,10 @@ import { createBrowserRouter } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
 import AuthLayout from '@/layouts/AuthLayout';
 import AdminLayout from '@/layouts/AdminLayout';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import ForgotPassword from '@/pages/ForgotPassword';
 import Login from '@/pages/Login';
+import Profile from '@/pages/Profile';
 import Register from '@/pages/Register';
 import ResetPassword from '@/pages/ResetPassword';
 import About from '@/pages/public/About';
@@ -45,6 +47,15 @@ const router = createBrowserRouter([
       {
         path: 'contact',
         element: <Contact />,
+      },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: 'profile',
+            element: <Profile />,
+          },
+        ],
       },
       {
         path: '*',

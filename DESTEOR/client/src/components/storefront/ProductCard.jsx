@@ -1,7 +1,7 @@
 import { FiArrowUpRight } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
-import { formatPrice } from '@/data/storefront';
+import { formatPrice } from '@/utils/format';
 
 function ProductCard({ product }) {
   return (
@@ -31,9 +31,18 @@ function ProductCard({ product }) {
               aria-hidden="true"
             />
           </div>
-          <p className="mt-3 text-sm font-semibold text-matte-black">
-            {formatPrice(product.price)}
-          </p>
+          <div className="mt-3 flex items-center gap-2 text-sm font-semibold text-matte-black">
+            {product.salePrice ? (
+              <>
+                <span>{formatPrice(product.salePrice)}</span>
+                <span className="text-xs font-medium text-matte-black/45 line-through">
+                  {formatPrice(product.price)}
+                </span>
+              </>
+            ) : (
+              <span>{formatPrice(product.price)}</span>
+            )}
+          </div>
         </div>
       </Link>
     </article>

@@ -1,7 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 function ProductGallery({ product }) {
-  const [activeImage, setActiveImage] = useState(product.images[0]);
+  const fallbackImage =
+    'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=80';
+  const images = useMemo(
+    () => (product.images?.length ? product.images : [fallbackImage]),
+    [product.images]
+  );
+  const [activeImage, setActiveImage] = useState(images[0]);
+
+  useEffect(() => {
+    setActiveImage(images[0]);
+  }, [images, product.id]);
 
   return (
     <div className="grid gap-4">
@@ -13,7 +23,7 @@ function ProductGallery({ product }) {
         />
       </div>
       <div className="grid grid-cols-3 gap-3">
-        {product.images.map((image) => (
+        {images.map((image) => (
           <button
             key={image}
             type="button"

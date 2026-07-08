@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import Newsletter from '@/components/storefront/Newsletter';
@@ -6,13 +7,58 @@ import ProductGrid from '@/components/storefront/ProductGrid';
 import SectionHeading from '@/components/storefront/SectionHeading';
 import Button from '@/components/ui/Button';
 import Container from '@/components/ui/Container';
+import Loader from '@/components/ui/Loader';
 import Section from '@/components/ui/Section';
 import { APP_TAGLINE } from '@/constants/app';
 import { ROUTES } from '@/constants/routes';
-import { categories, collections, products } from '@/data/storefront';
+import { getCategories } from '@/services/category.service';
+import { getCollections } from '@/services/collection.service';
+import {
+  getBestSellerProducts,
+  getFeaturedProducts,
+} from '@/services/product.service';
 
 function Home() {
-  const bestSellers = products.filter((product) => product.isBestSeller).slice(0, 4);
+  const [categories, setCategories] = useState([]);
+  const [collections, setCollections] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [bestSellers, setBestSellers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadStorefront() {
+      try {
+        const [categoryData, collectionData, featuredData, bestSellerData] =
+          await Promise.all([
+            getCategories(),
+            getCollections(),
+            getFeaturedProducts(4),
+            getBestSellerProducts(4),
+          ]);
+
+        if (!isMounted) return;
+        setCategories(categoryData);
+        setCollections(collectionData);
+        setFeaturedProducts(featuredData);
+        setBestSellers(bestSellerData);
+      } catch (requestError) {
+        if (isMounted) {
+          setError(requestError.message || 'Unable to load storefront products.');
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    loadStorefront();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <>
@@ -68,7 +114,7 @@ function Home() {
             {collections.map((collection) => (
               <Link
                 key={collection.id}
-                to={ROUTES.SHOP}
+                to={`${ROUTES.SHOP}?collection=${collection.slug}`}
                 className="group relative min-h-96 overflow-hidden bg-matte-black"
               >
                 <img
@@ -95,13 +141,41 @@ function Home() {
 
       <Section className="bg-white">
         <Container>
+          {loading && (
+            <div className="mb-10 flex justify-center">
+              <Loader label="Loading featured products" />
+            </div>
+          )}
+          {error && (
+            <div className="mb-10 border border-matte-black/10 bg-ivory-white p-5 text-sm text-matte-black/68">
+              {error}
+            </div>
+          )}
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <SectionHeading
+              eyebrow="Featured"
+              title="Curated for the ceremony"
+              description="Database-backed selections chosen for polish, proportion, and bridal presence."
+            />
+            <Link to={ROUTES.SHOP} className="text-sm font-semibold uppercase tracking-[0.22em] text-matte-black hover:text-champagne-gold">
+              View all
+            </Link>
+          </div>
+          <div className="mt-10">
+            <ProductGrid products={featuredProducts} />
+          </div>
+        </Container>
+      </Section>
+
+      <Section className="bg-white">
+        <Container>
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <SectionHeading
               eyebrow="Best Sellers"
               title="Most requested pieces"
-              description="A focused selection of bridal favourites chosen for polish, proportion, and repeat wear."
+              description="Customer favourites with a balance of ceremony detail and repeat styling."
             />
-            <Link to={ROUTES.SHOP} className="text-sm font-semibold uppercase tracking-[0.22em] text-matte-black hover:text-champagne-gold">
+            <Link to={`${ROUTES.SHOP}?sort=featured`} className="text-sm font-semibold uppercase tracking-[0.22em] text-matte-black hover:text-champagne-gold">
               View all
             </Link>
           </div>
@@ -122,7 +196,7 @@ function Home() {
             {categories.map((category) => (
               <Link
                 key={category.id}
-                to={ROUTES.SHOP}
+                to={`${ROUTES.SHOP}?category=${category.slug}`}
                 className="group border border-matte-black/10 bg-white p-4 transition duration-300 hover:-translate-y-1 hover:shadow-elevated"
               >
                 <div className="aspect-[4/3] overflow-hidden bg-matte-black/5">
