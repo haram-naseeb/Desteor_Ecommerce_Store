@@ -14,6 +14,15 @@ enum Role {
   ADMIN
 }
 
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  PACKED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
 model User {
   id                       String    @id @default(cuid())
   firstName                String
@@ -26,6 +35,7 @@ model User {
   resetPasswordTokenHash   String?
   resetPasswordTokenExpiry DateTime?
   cart                     Cart?
+  orders                   Order[]
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 
@@ -76,6 +86,7 @@ model Product {
   images         ProductImage[]
   specifications ProductSpecification[]
   cartItems      CartItem[]
+  orderItems     OrderItem[]
   createdAt      DateTime               @default(now())
   updatedAt      DateTime               @updatedAt
 
@@ -110,6 +121,41 @@ model CartItem {
 
   @@unique([cartId, productId])
   @@index([cartId])
+  @@index([productId])
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  orderNumber String      @unique
+  userId      String
+  subtotal    Int
+  shipping    Int
+  total       Int
+  status      OrderStatus @default(PENDING)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  items       OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([orderNumber])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id                   String   @id @default(cuid())
+  orderId              String
+  productId            String
+  quantity             Int
+  unitPrice            Int
+  productNameSnapshot  String
+  productImageSnapshot String?
+  order                Order    @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product              Product  @relation(fields: [productId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  createdAt            DateTime @default(now())
+
+  @@index([orderId])
   @@index([productId])
 }
 

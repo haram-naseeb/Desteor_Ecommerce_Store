@@ -17,6 +17,7 @@ export const ROUTES = {
   CONTACT: '/contact',
   CART: '/cart',
   CHECKOUT: '/checkout',
+  ORDERS: '/orders',
   PROFILE: '/profile',
   LOGIN: '/login',
   REGISTER: '/register',

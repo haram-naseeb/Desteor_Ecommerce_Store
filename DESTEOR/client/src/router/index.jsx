@@ -5,8 +5,11 @@ import AuthLayout from '@/layouts/AuthLayout';
 import AdminLayout from '@/layouts/AdminLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Cart from '@/pages/Cart';
+import Checkout from '@/pages/Checkout';
 import ForgotPassword from '@/pages/ForgotPassword';
 import Login from '@/pages/Login';
+import OrderDetails from '@/pages/OrderDetails';
+import Orders from '@/pages/Orders';
 import Profile from '@/pages/Profile';
 import Register from '@/pages/Register';
 import ResetPassword from '@/pages/ResetPassword';
@@ -59,6 +62,18 @@ const router = createBrowserRouter([
           {
             path: 'cart',
             element: <Cart />,
+          },
+          {
+            path: 'checkout',
+            element: <Checkout />,
+          },
+          {
+            path: 'orders',
+            element: <Orders />,
+          },
+          {
+            path: 'orders/:id',
+            element: <OrderDetails />,
           },
         ],
       },

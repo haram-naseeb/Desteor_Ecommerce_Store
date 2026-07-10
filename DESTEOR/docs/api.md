@@ -176,3 +176,51 @@ Cart response shape:
   }
 }
 ```
+
+### Orders
+
+All order endpoints require an authenticated `Authorization: Bearer <token>`
+header. Customers can only access their own orders.
+
+**`POST /api/orders/checkout`**
+
+Creates an order from the authenticated user's current cart.
+
+Checkout behavior:
+
+- Verifies the cart is not empty.
+- Verifies every product still exists and has sufficient stock.
+- Calculates subtotal from current backend product prices.
+- Applies shipping: free at `PKR 5,000+`, otherwise `PKR 100`.
+- Creates an order with status `PENDING`.
+- Creates snapshot order items.
+- Reduces product stock.
+- Clears the cart.
+
+**Response `201 Created`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "order": {
+      "id": "order_id",
+      "orderNumber": "DST-20260710-1234",
+      "status": "PENDING",
+      "subtotal": 5200,
+      "shipping": 0,
+      "total": 5200,
+      "items": []
+    }
+  },
+  "message": "Order placed successfully."
+}
+```
+
+**`GET /api/orders`**
+
+Returns the authenticated user's orders, newest first.
+
+**`GET /api/orders/:id`**
+
+Returns one order if it belongs to the authenticated user.

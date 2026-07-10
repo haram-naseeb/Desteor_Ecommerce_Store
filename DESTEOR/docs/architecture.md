@@ -70,6 +70,32 @@ only frontend module that knows the cart API response shape.
 
 ---
 
+## Sprint 6 Checkout And Orders
+
+Checkout converts the authenticated user's live cart into a persisted order.
+The backend order domain follows the existing layering:
+
+```
+order.routes -> order.controller -> order.service -> order.repository -> Prisma
+```
+
+`order.service` owns checkout business rules: non-empty cart validation, stock
+checks, backend-only totals, shipping calculation, unique order number
+generation, stock decrement, and cart clearing. `order.repository` owns the
+Prisma transaction and all database reads/writes. New orders always start with
+`PENDING`; customer routes never accept status updates.
+
+Order items store product snapshots (`productNameSnapshot`,
+`productImageSnapshot`, and `unitPrice`) so historical order details remain
+stable if catalog data changes later.
+
+The frontend uses `order.service` as the only API adapter for checkout and order
+history. `Checkout`, `Orders`, and `OrderDetails` are protected customer pages
+that compose existing layout, cart, and auth context rather than duplicating
+state.
+
+---
+
 ## Frontend Structure
 
 | Folder | Responsibility |

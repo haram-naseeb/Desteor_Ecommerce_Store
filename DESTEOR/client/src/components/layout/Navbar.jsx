@@ -38,6 +38,10 @@ function Navbar() {
           label: currentUser?.firstName ? `Profile` : 'Profile',
           to: ROUTES.PROFILE,
         },
+        {
+          label: 'Orders',
+          to: ROUTES.ORDERS,
+        },
       ]
     : [
         { label: 'Login', to: ROUTES.LOGIN },
