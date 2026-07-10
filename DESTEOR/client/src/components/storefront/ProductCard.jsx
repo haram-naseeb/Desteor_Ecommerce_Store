@@ -1,9 +1,50 @@
-import { FiArrowUpRight } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { FiArrowUpRight, FiShoppingBag } from 'react-icons/fi';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
+import Button from '@/components/ui/Button';
+import { ROUTES } from '@/constants/routes';
+import { useAuth } from '@/hooks/useAuth';
+import { useCart } from '@/hooks/useCart';
 import { formatPrice } from '@/utils/format';
 
 function ProductCard({ product }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
+  const { addItem, mutatingItemId } = useCart();
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const isAdding = mutatingItemId === product.id;
+
+  const handleAddToCart = async () => {
+    setMessage('');
+    setError('');
+
+    if (!isAuthenticated) {
+      navigate(ROUTES.LOGIN, {
+        state: {
+          from: {
+            pathname: location.pathname,
+            search: location.search,
+          },
+          pendingCartItem: {
+            productId: product.id,
+            quantity: 1,
+          },
+        },
+      });
+      return;
+    }
+
+    try {
+      await addItem({ productId: product.id, quantity: 1 });
+      setMessage('Added to cart.');
+    } catch (requestError) {
+      setError(requestError.message || 'Unable to add item.');
+    }
+  };
+
   return (
     <article className="group overflow-hidden border border-matte-black/10 bg-ivory-white shadow-subtle transition duration-300 hover:-translate-y-1 hover:shadow-elevated">
       <Link to={`/shop/${product.slug}`} className="block">
@@ -20,7 +61,9 @@ function ProductCard({ product }) {
             </span>
           )}
         </div>
-        <div className="p-5">
+      </Link>
+      <div className="p-5">
+        <Link to={`/shop/${product.slug}`} className="block">
           <p className="text-xs uppercase tracking-[0.22em] text-champagne-gold">
             {product.category}
           </p>
@@ -43,8 +86,35 @@ function ProductCard({ product }) {
               <span>{formatPrice(product.price)}</span>
             )}
           </div>
+        </Link>
+        {(message || error) && (
+          <p
+            className={`mt-4 text-xs font-medium ${
+              error ? 'text-red-600' : 'text-matte-black/58'
+            }`}
+          >
+            {error || message}
+          </p>
+        )}
+        <div className="mt-5 grid grid-cols-2 gap-2">
+          <Link to={`/shop/${product.slug}`} className="block">
+            <Button variant="ghost" size="sm" className="w-full rounded-none">
+              Details
+            </Button>
+          </Link>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="w-full rounded-none"
+            disabled={product.stock < 1 || isAdding}
+            onClick={handleAddToCart}
+          >
+            <FiShoppingBag className="mr-2" aria-hidden="true" />
+            {isAdding ? 'Adding' : 'Add'}
+          </Button>
         </div>
-      </Link>
+      </div>
     </article>
   );
 }

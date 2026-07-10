@@ -33,7 +33,12 @@ function LoginForm() {
       const redirectTo = `${location.state?.from?.pathname || ROUTES.HOME}${
         location.state?.from?.search || ''
       }`;
-      navigate(redirectTo, { replace: true });
+      navigate(redirectTo, {
+        replace: true,
+        state: location.state?.pendingCartItem
+          ? { pendingCartItem: location.state.pendingCartItem }
+          : undefined,
+      });
     } catch (error) {
       setFormError(error.message);
     }

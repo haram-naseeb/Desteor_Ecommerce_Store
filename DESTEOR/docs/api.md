@@ -112,3 +112,67 @@ Returns paginated products for one category. Supports the same query params as
 **`GET /api/collections`**
 
 Returns all product collections with product counts.
+
+### Cart
+
+All cart endpoints require an authenticated `Authorization: Bearer <token>`
+header. Cart totals are calculated by the backend.
+
+**`GET /api/cart`**
+
+Returns the current user's cart, creating an empty cart if one does not exist.
+
+**`POST /api/cart/items`**
+
+Adds a product to the current user's cart. If the product already exists in the
+cart, the quantity is increased on the existing row.
+
+Request:
+
+```json
+{
+  "productId": "product_id",
+  "quantity": 1
+}
+```
+
+**`PATCH /api/cart/items/:id`**
+
+Updates a cart item quantity. Sending `0` removes the item.
+
+Request:
+
+```json
+{
+  "quantity": 2
+}
+```
+
+**`DELETE /api/cart/items/:id`**
+
+Removes one cart item.
+
+**`DELETE /api/cart/clear`**
+
+Removes all items from the current user's cart.
+
+Cart response shape:
+
+```json
+{
+  "success": true,
+  "data": {
+    "cart": {
+      "id": "cart_id",
+      "items": [],
+      "summary": {
+        "totalItems": 0,
+        "subtotal": 0,
+        "estimatedShipping": 0,
+        "estimatedTax": 0,
+        "estimatedTotal": 0
+      }
+    }
+  }
+}
+```

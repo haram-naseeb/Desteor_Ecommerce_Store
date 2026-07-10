@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { FiShield, FiTruck } from 'react-icons/fi';
+import { useEffect, useRef, useState } from 'react';
+import { FiShield, FiShoppingBag, FiTruck } from 'react-icons/fi';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import Breadcrumbs from '@/components/storefront/Breadcrumbs';
@@ -11,6 +11,7 @@ import Container from '@/components/ui/Container';
 import Loader from '@/components/ui/Loader';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/useAuth';
+import { useCart } from '@/hooks/useCart';
 import { getProductBySlug } from '@/services/product.service';
 import { formatPrice } from '@/utils/format';
 
@@ -19,10 +20,14 @@ function ProductDetails() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated } = useAuth();
+  const { addItem, mutatingItemId } = useCart();
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [actionMessage, setActionMessage] = useState('');
+  const [actionError, setActionError] = useState('');
+  const pendingHandledRef = useRef(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -53,7 +58,48 @@ function ProductDetails() {
     };
   }, [slug]);
 
-  const handleBuyNow = () => {
+  useEffect(() => {
+    const pendingCartItem = location.state?.pendingCartItem;
+
+    if (
+      pendingHandledRef.current ||
+      !pendingCartItem ||
+      !isAuthenticated ||
+      !product ||
+      pendingCartItem.productId !== product.id
+    ) {
+      return;
+    }
+
+    pendingHandledRef.current = true;
+
+    async function completePendingAdd() {
+      try {
+        await addItem(pendingCartItem);
+        setActionMessage('Added to cart. You can continue shopping or review your cart.');
+        navigate(location.pathname, {
+          replace: true,
+          state: {
+            notice: 'Your intended item was added to cart after login.',
+          },
+        });
+      } catch (requestError) {
+        setActionError(
+          requestError.message || 'Please try adding this piece to your cart again.'
+        );
+        navigate(location.pathname, {
+          replace: true,
+          state: {
+            notice: 'Please retry adding this piece to your cart.',
+          },
+        });
+      }
+    }
+
+    completePendingAdd();
+  }, [addItem, isAuthenticated, location.pathname, location.state, navigate, product]);
+
+  const redirectGuestToLogin = () => {
     if (!isAuthenticated) {
       navigate(ROUTES.LOGIN, {
         state: {
@@ -61,18 +107,49 @@ function ProductDetails() {
             pathname: location.pathname,
             search: location.search,
           },
+          pendingCartItem: product
+            ? {
+                productId: product.id,
+                quantity: 1,
+              }
+            : undefined,
         },
       });
-      return;
+      return true;
     }
 
-    navigate(location.pathname, {
-      replace: true,
-      state: {
-        notice: 'Checkout arrives in a later sprint. Your account is ready.',
-      },
-    });
+    return false;
   };
+
+  const handleAddToCart = async () => {
+    setActionMessage('');
+    setActionError('');
+
+    if (redirectGuestToLogin()) return;
+
+    try {
+      await addItem({ productId: product.id, quantity: 1 });
+      setActionMessage('Added to cart.');
+    } catch (requestError) {
+      setActionError(requestError.message || 'Unable to add this piece to cart.');
+    }
+  };
+
+  const handleBuyNow = async () => {
+    setActionMessage('');
+    setActionError('');
+
+    if (redirectGuestToLogin()) return;
+
+    try {
+      await addItem({ productId: product.id, quantity: 1 });
+      navigate(ROUTES.CHECKOUT);
+    } catch (requestError) {
+      setActionError(requestError.message || 'Unable to prepare checkout.');
+    }
+  };
+
+  const isAdding = product ? mutatingItemId === product.id : false;
 
   if (loading) {
     return (
@@ -141,6 +218,18 @@ function ProductDetails() {
             </div>
           )}
 
+          {(actionMessage || actionError) && (
+            <div
+              className={`mt-6 border p-4 text-sm ${
+                actionError
+                  ? 'border-red-200 bg-red-50 text-red-700'
+                  : 'border-champagne-gold/45 bg-champagne-gold/10 text-matte-black/70'
+              }`}
+            >
+              {actionError || actionMessage}
+            </div>
+          )}
+
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
             <div className="border border-matte-black/10 bg-white p-4">
               <FiTruck className="text-champagne-gold" aria-hidden="true" />
@@ -162,16 +251,29 @@ function ProductDetails() {
             </div>
           </div>
 
-          <Button
-            type="button"
-            variant="secondary"
-            size="lg"
-            className="mt-8 w-full rounded-none sm:w-auto"
-            disabled={product.stock < 1}
-            onClick={handleBuyNow}
-          >
-            Buy Now
-          </Button>
+          <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            <Button
+              type="button"
+              variant="primary"
+              size="lg"
+              className="w-full rounded-none"
+              disabled={product.stock < 1 || isAdding}
+              onClick={handleAddToCart}
+            >
+              <FiShoppingBag className="mr-2" aria-hidden="true" />
+              {isAdding ? 'Adding' : 'Add to Cart'}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              className="w-full rounded-none"
+              disabled={product.stock < 1 || isAdding}
+              onClick={handleBuyNow}
+            >
+              Buy Now
+            </Button>
+          </div>
 
           <div className="mt-9 border-y border-matte-black/10 py-7">
             <h2 className="text-2xl text-matte-black">Specifications</h2>

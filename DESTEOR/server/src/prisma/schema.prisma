@@ -25,6 +25,7 @@ model User {
   refreshTokenHash         String?
   resetPasswordTokenHash   String?
   resetPasswordTokenExpiry DateTime?
+  cart                     Cart?
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 
@@ -74,6 +75,7 @@ model Product {
   collection     Collection             @relation(fields: [collectionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   images         ProductImage[]
   specifications ProductSpecification[]
+  cartItems      CartItem[]
   createdAt      DateTime               @default(now())
   updatedAt      DateTime               @updatedAt
 
@@ -83,6 +85,32 @@ model Product {
   @@index([featured])
   @@index([bestSeller])
   @@index([price])
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([userId])
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  productId String
+  quantity  Int
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
+  @@index([cartId])
+  @@index([productId])
 }
 
 model ProductImage {

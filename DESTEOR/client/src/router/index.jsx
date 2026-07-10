@@ -4,6 +4,7 @@ import MainLayout from '@/layouts/MainLayout';
 import AuthLayout from '@/layouts/AuthLayout';
 import AdminLayout from '@/layouts/AdminLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import Cart from '@/pages/Cart';
 import ForgotPassword from '@/pages/ForgotPassword';
 import Login from '@/pages/Login';
 import Profile from '@/pages/Profile';
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
           {
             path: 'profile',
             element: <Profile />,
+          },
+          {
+            path: 'cart',
+            element: <Cart />,
           },
         ],
       },

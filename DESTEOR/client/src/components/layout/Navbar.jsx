@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { FiMenu, FiX } from 'react-icons/fi';
+import { AnimatePresence, motion } from 'framer-motion';
+import { FiMenu, FiShoppingBag, FiX } from 'react-icons/fi';
 import { Link, NavLink } from 'react-router-dom';
 
 import { APP_NAME } from '@/constants/app';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/useAuth';
+import { useCart } from '@/hooks/useCart';
 
 const navItems = [
   { label: 'Home', to: ROUTES.HOME },
@@ -16,6 +18,7 @@ const navItems = [
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { currentUser, isAuthenticated, logout } = useAuth();
+  const { totalItems } = useCart();
 
   const linkClass = ({ isActive }) =>
     `text-sm font-medium uppercase tracking-[0.22em] transition-colors ${
@@ -41,6 +44,34 @@ function Navbar() {
         { label: 'Register', to: ROUTES.REGISTER },
       ];
 
+  const cartLink = (
+    <NavLink
+      to={ROUTES.CART}
+      className={({ isActive }) =>
+        `relative inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.22em] transition-colors ${
+          isActive ? 'text-champagne-gold' : 'text-ivory-white/78 hover:text-champagne-gold'
+        }`
+      }
+      onClick={closeMenu}
+    >
+      <FiShoppingBag aria-hidden="true" />
+      Cart
+      <AnimatePresence mode="popLayout">
+        {totalItems > 0 && (
+          <motion.span
+            key={totalItems}
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.6, opacity: 0 }}
+            className="grid h-5 min-w-5 place-items-center rounded-full bg-champagne-gold px-1.5 text-[0.65rem] font-bold leading-none text-matte-black"
+          >
+            {totalItems}
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </NavLink>
+  );
+
   return (
     <header className="sticky top-0 z-50 border-b border-ivory-white/10 bg-matte-black/95 backdrop-blur">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -64,6 +95,7 @@ function Navbar() {
               {item.label}
             </NavLink>
           ))}
+          {isAuthenticated && cartLink}
           {isAuthenticated && (
             <button
               type="button"
@@ -109,6 +141,7 @@ function Navbar() {
                 {item.label}
               </NavLink>
             ))}
+            {isAuthenticated && cartLink}
             {isAuthenticated && (
               <button
                 type="button"

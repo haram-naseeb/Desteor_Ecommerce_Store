@@ -47,6 +47,29 @@ required when a customer starts a purchase intent, such as Product Details'
 
 ---
 
+## Sprint 5 Cart
+
+Shopping cart data is database-backed through `Cart` and `CartItem`. Each user
+has at most one cart, and each product can appear only once per cart. Cart items
+cascade when a cart is removed, while product deletion remains restricted when
+cart items reference the product.
+
+The cart domain follows the established backend layering:
+
+```
+cart.routes -> cart.controller -> cart.service -> cart.repository -> Prisma
+```
+
+Cart business rules live in `cart.service`: add operations increment existing
+rows, stock is enforced before writes, zero quantity removes an item, and
+subtotal/total item counts are calculated by the backend response mapper.
+
+On the frontend, `CartProvider` owns authenticated cart hydration and mutations.
+Feature UI reads cart state through `useCart`, while `cart.service` remains the
+only frontend module that knows the cart API response shape.
+
+---
+
 ## Frontend Structure
 
 | Folder | Responsibility |
