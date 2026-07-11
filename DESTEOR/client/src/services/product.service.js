@@ -1,6 +1,6 @@
 import api from '@/services/api';
 
-function normalizeProduct(product) {
+export function normalizeProduct(product) {
   const images = product.images?.map((image) => image.url) || [];
   const specifications = product.specifications || [];
 

@@ -1,6 +1,8 @@
 import { RouterProvider } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { CartProvider } from '@/contexts/CartContext';
+import { WishlistProvider } from '@/contexts/WishlistContext';
+import ToastProvider from '@/components/ui/ToastProvider';
 import router from '@/router';
 
 /**
@@ -13,9 +15,11 @@ import router from '@/router';
 function App() {
   return (
     <AuthProvider>
-      <CartProvider>
-        <RouterProvider router={router} />
-      </CartProvider>
+      <ToastProvider>
+        <CartProvider>
+          <WishlistProvider><RouterProvider router={router} /></WishlistProvider>
+        </CartProvider>
+      </ToastProvider>
     </AuthProvider>
   );
 }

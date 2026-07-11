@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { FiArrowUpRight, FiShoppingBag } from 'react-icons/fi';
+import { FiArrowUpRight, FiHeart, FiShoppingBag } from 'react-icons/fi';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import Button from '@/components/ui/Button';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
+import { useToast } from '@/hooks/useToast';
 import { formatPrice } from '@/utils/format';
 
 function ProductCard({ product }) {
@@ -13,14 +14,11 @@ function ProductCard({ product }) {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   const { addItem, mutatingItemId } = useCart();
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const { hasItem, mutatingProductId, toggleItem } = useWishlist();
+  const { showToast } = useToast();
   const isAdding = mutatingItemId === product.id;
 
   const handleAddToCart = async () => {
-    setMessage('');
-    setError('');
-
     if (!isAuthenticated) {
       navigate(ROUTES.LOGIN, {
         state: {
@@ -39,10 +37,15 @@ function ProductCard({ product }) {
 
     try {
       await addItem({ productId: product.id, quantity: 1 });
-      setMessage('Added to cart.');
+      showToast('Added to cart.', 'success');
     } catch (requestError) {
-      setError(requestError.message || 'Unable to add item.');
+      showToast(requestError.message || 'Unable to add item.', 'error');
     }
+  };
+
+  const handleWishlist = async () => {
+    if (!isAuthenticated) { navigate(ROUTES.LOGIN, { state: { from: { pathname: location.pathname, search: location.search }, pendingWishlistProductId: product.id } }); return; }
+    try { const added = await toggleItem(product.id); showToast(added ? 'Saved to your wishlist.' : 'Removed from your wishlist.', 'success'); } catch (requestError) { showToast(requestError.message || 'Unable to update wishlist.', 'error'); }
   };
 
   return (
@@ -60,6 +63,7 @@ function ProductCard({ product }) {
               {product.badge}
             </span>
           )}
+          <button type="button" onClick={(event) => { event.preventDefault(); handleWishlist(); }} disabled={mutatingProductId === product.id} aria-label={hasItem(product.id) ? 'Remove from wishlist' : 'Add to wishlist'} className={`absolute right-4 top-4 grid h-9 w-9 place-items-center bg-white transition hover:text-champagne-gold ${hasItem(product.id) ? 'text-champagne-gold' : 'text-matte-black'}`}><FiHeart fill={hasItem(product.id) ? 'currentColor' : 'none'} /></button>
         </div>
       </Link>
       <div className="p-5">
@@ -87,15 +91,6 @@ function ProductCard({ product }) {
             )}
           </div>
         </Link>
-        {(message || error) && (
-          <p
-            className={`mt-4 text-xs font-medium ${
-              error ? 'text-red-600' : 'text-matte-black/58'
-            }`}
-          >
-            {error || message}
-          </p>
-        )}
         <div className="mt-5 grid grid-cols-2 gap-2">
           <Link to={`/shop/${product.slug}`} className="block">
             <Button variant="ghost" size="sm" className="w-full rounded-none">

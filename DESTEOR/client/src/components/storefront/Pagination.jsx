@@ -1,0 +1,6 @@
+function Pagination({ meta, onPageChange }) {
+  if (meta.totalPages <= 1) return null;
+  return <nav className="mt-10 flex flex-wrap justify-center gap-2" aria-label="Pagination"><button type="button" disabled={!meta.hasPreviousPage} onClick={() => onPageChange(meta.page - 1)} className="h-10 border border-matte-black/15 px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40">Previous</button>{Array.from({ length: meta.totalPages }, (_, index) => index + 1).map((number) => <button key={number} type="button" onClick={() => onPageChange(number)} className={`h-10 w-10 border text-sm font-semibold ${meta.page === number ? 'border-matte-black bg-matte-black text-ivory-white' : 'border-matte-black/15 text-matte-black hover:border-champagne-gold'}`} aria-current={meta.page === number ? 'page' : undefined}>{number}</button>)}<button type="button" disabled={!meta.hasNextPage} onClick={() => onPageChange(meta.page + 1)} className="h-10 border border-matte-black/15 px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40">Next</button></nav>;
+}
+
+export default Pagination;

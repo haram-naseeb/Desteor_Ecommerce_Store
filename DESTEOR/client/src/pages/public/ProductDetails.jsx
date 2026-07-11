@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { FiShield, FiShoppingBag, FiTruck } from 'react-icons/fi';
+import { FiHeart, FiShield, FiShoppingBag, FiTruck } from 'react-icons/fi';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import Breadcrumbs from '@/components/storefront/Breadcrumbs';
 import ProductGallery from '@/components/storefront/ProductGallery';
 import ProductGrid from '@/components/storefront/ProductGrid';
+import ReviewSection from '@/components/storefront/ReviewSection';
 import SectionHeading from '@/components/storefront/SectionHeading';
 import Button from '@/components/ui/Button';
 import Container from '@/components/ui/Container';
@@ -12,6 +13,8 @@ import Loader from '@/components/ui/Loader';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
+import { useToast } from '@/hooks/useToast';
+import { useWishlist } from '@/hooks/useWishlist';
 import { getProductBySlug } from '@/services/product.service';
 import { formatPrice } from '@/utils/format';
 
@@ -21,6 +24,8 @@ function ProductDetails() {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   const { addItem, mutatingItemId } = useCart();
+  const { hasItem, mutatingProductId, toggleItem } = useWishlist();
+  const { showToast } = useToast();
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,6 +33,7 @@ function ProductDetails() {
   const [actionMessage, setActionMessage] = useState('');
   const [actionError, setActionError] = useState('');
   const pendingHandledRef = useRef(false);
+  const pendingWishlistHandledRef = useRef(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -99,6 +105,16 @@ function ProductDetails() {
     completePendingAdd();
   }, [addItem, isAuthenticated, location.pathname, location.state, navigate, product]);
 
+  useEffect(() => {
+    const pendingWishlistProductId = location.state?.pendingWishlistProductId;
+    if (pendingWishlistHandledRef.current || !pendingWishlistProductId || !isAuthenticated || !product || pendingWishlistProductId !== product.id) return;
+    pendingWishlistHandledRef.current = true;
+    toggleItem(product.id)
+      .then((added) => showToast(added ? 'Saved to your wishlist.' : 'Removed from your wishlist.', 'success'))
+      .catch((requestError) => showToast(requestError.message || 'Unable to update wishlist.', 'error'))
+      .finally(() => navigate(location.pathname, { replace: true }));
+  }, [isAuthenticated, location.pathname, location.state, navigate, product, showToast, toggleItem]);
+
   const redirectGuestToLogin = () => {
     if (!isAuthenticated) {
       navigate(ROUTES.LOGIN, {
@@ -146,6 +162,19 @@ function ProductDetails() {
       navigate(ROUTES.CHECKOUT);
     } catch (requestError) {
       setActionError(requestError.message || 'Unable to prepare checkout.');
+    }
+  };
+
+  const handleWishlist = async () => {
+    if (!isAuthenticated) {
+      navigate(ROUTES.LOGIN, { state: { from: { pathname: location.pathname, search: location.search }, pendingWishlistProductId: product.id } });
+      return;
+    }
+    try {
+      const added = await toggleItem(product.id);
+      showToast(added ? 'Saved to your wishlist.' : 'Removed from your wishlist.', 'success');
+    } catch (requestError) {
+      showToast(requestError.message || 'Unable to update wishlist.', 'error');
     }
   };
 
@@ -251,6 +280,11 @@ function ProductDetails() {
             </div>
           </div>
 
+          <button type="button" onClick={handleWishlist} disabled={mutatingProductId === product.id} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-matte-black transition hover:text-champagne-gold disabled:cursor-not-allowed disabled:opacity-50" aria-pressed={hasItem(product.id)}>
+            <FiHeart fill={hasItem(product.id) ? 'currentColor' : 'none'} aria-hidden="true" />
+            {hasItem(product.id) ? 'Remove from wishlist' : 'Save to wishlist'}
+          </button>
+
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
             <Button
               type="button"
@@ -299,6 +333,7 @@ function ProductDetails() {
           <ProductGrid products={relatedProducts} />
         </div>
       </section>
+      <ReviewSection productId={product.id} />
     </Container>
   );
 }

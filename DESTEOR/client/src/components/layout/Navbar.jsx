@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FiMenu, FiShoppingBag, FiX } from 'react-icons/fi';
-import { Link, NavLink } from 'react-router-dom';
+import { FiHeart, FiMenu, FiSearch, FiShoppingBag, FiX } from 'react-icons/fi';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 
 import { APP_NAME } from '@/constants/app';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
 
 const navItems = [
   { label: 'Home', to: ROUTES.HOME },
@@ -16,9 +17,12 @@ const navItems = [
 ];
 
 function Navbar() {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { currentUser, isAuthenticated, logout } = useAuth();
   const { totalItems } = useCart();
+  const { totalItems: wishlistItems } = useWishlist();
+  const [search, setSearch] = useState('');
 
   const linkClass = ({ isActive }) =>
     `text-sm font-medium uppercase tracking-[0.22em] transition-colors ${
@@ -32,8 +36,17 @@ function Navbar() {
     closeMenu();
   };
 
+  const submitSearch = (event) => {
+    event.preventDefault();
+    const query = search.trim();
+    if (query) navigate(`${ROUTES.SEARCH}?q=${encodeURIComponent(query)}`);
+    else navigate(ROUTES.SEARCH);
+    closeMenu();
+  };
+
   const authLinks = isAuthenticated
     ? [
+        ...(currentUser?.role === 'ADMIN' ? [{ label: 'Admin Dashboard', to: ROUTES.ADMIN.DASHBOARD }] : []),
         {
           label: currentUser?.firstName ? `Profile` : 'Profile',
           to: ROUTES.PROFILE,
@@ -76,6 +89,12 @@ function Navbar() {
     </NavLink>
   );
 
+  const wishlistLink = (
+    <NavLink to={ROUTES.WISHLIST} className={linkClass} onClick={closeMenu}>
+      <span className="relative inline-flex items-center gap-2"><FiHeart aria-hidden="true" />Wishlist{wishlistItems > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-champagne-gold px-1.5 text-[0.65rem] font-bold leading-none text-matte-black">{wishlistItems}</span>}</span>
+    </NavLink>
+  );
+
   return (
     <header className="sticky top-0 z-50 border-b border-ivory-white/10 bg-matte-black/95 backdrop-blur">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -99,6 +118,12 @@ function Navbar() {
               {item.label}
             </NavLink>
           ))}
+          <form onSubmit={submitSearch} className="relative">
+            <label className="sr-only" htmlFor="navbar-search">Search products</label>
+            <FiSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ivory-white/55" aria-hidden="true" />
+            <input id="navbar-search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search" className="w-28 border-b border-ivory-white/30 bg-transparent py-1 pl-8 text-sm text-ivory-white outline-none placeholder:text-ivory-white/45 focus:border-champagne-gold xl:w-40" />
+          </form>
+          {isAuthenticated && wishlistLink}
           {isAuthenticated && cartLink}
           {isAuthenticated && (
             <button
@@ -125,6 +150,11 @@ function Navbar() {
       {isOpen && (
         <div className="border-t border-ivory-white/10 bg-matte-black px-6 py-5 md:hidden">
           <div className="flex flex-col gap-5">
+            <form onSubmit={submitSearch} className="relative">
+              <label className="sr-only" htmlFor="mobile-navbar-search">Search products</label>
+              <FiSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ivory-white/55" aria-hidden="true" />
+              <input id="mobile-navbar-search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search products" className="w-full border border-ivory-white/25 bg-transparent py-2 pl-9 pr-3 text-sm text-ivory-white outline-none placeholder:text-ivory-white/45 focus:border-champagne-gold" />
+            </form>
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
@@ -145,6 +175,7 @@ function Navbar() {
                 {item.label}
               </NavLink>
             ))}
+            {isAuthenticated && wishlistLink}
             {isAuthenticated && cartLink}
             {isAuthenticated && (
               <button

@@ -125,3 +125,19 @@ Pages (added in later sprints) compose layouts + UI components + feature-specifi
 - **Configuration is centralized**, so environment or branding changes happen in one place, not scattered across the codebase.
 
 This document will be updated as new architectural decisions are made in future sprints.
+# Sprint 7A: Admin module
+
+## Sprint 7B additions
+
+Cloudinary is isolated behind `media.service.js`; uploads are validated by the reusable memory-storage upload middleware. The database persists secure URL and Cloudinary public ID separately, allowing product images to be replaced or removed without leaking provider concerns into controllers. Admin user/profile functionality stays within the existing controller → service → repository boundary.
+
+The admin API is isolated under `server/src/routes/admin.routes.js` and mounted at `/api/admin`. Every route passes through `protect` and `requireRole('ADMIN')`. Its controller delegates to `admin.service.js`, which owns authorization-sensitive business rules (safe deletion and order transition validation); `admin.repository.js` is the only layer accessing Prisma.
+
+The React `/admin` route tree is guarded by `AdminRoute`. `AdminLayout` provides the internal sidebar shell, while dashboard, product, order, category, and collection pages call the admin service rather than customer-facing APIs.
+# Sprint 8: Shopping Experience
+
+Wishlist state is owned by `WishlistProvider`, which hydrates only for an authenticated customer and exposes optimistic-facing mutations through `useWishlist`. Product cards and Product Details preserve a pending wishlist product ID through login, then complete the intended action on return.
+
+Reviews follow the established backend boundary: `product.routes -> review.controller -> review.service -> review.repository -> Prisma`. The service enforces one review per user/product and review ownership for edits and deletes. `ReviewSection` consumes the review API and owns its local form state.
+
+Catalog filtering and global search both use the existing public product query endpoint. URL search parameters remain the source of truth for shop filters, result pages, sorting, and pagination, allowing catalog states to be shared and refreshed safely.

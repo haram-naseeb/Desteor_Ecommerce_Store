@@ -3,10 +3,11 @@ import { FiFilter, FiSearch } from 'react-icons/fi';
 import { useSearchParams } from 'react-router-dom';
 
 import PageHero from '@/components/storefront/PageHero';
+import Pagination from '@/components/storefront/Pagination';
 import ProductGrid from '@/components/storefront/ProductGrid';
+import ProductGridSkeleton from '@/components/storefront/ProductGridSkeleton';
 import Container from '@/components/ui/Container';
 import Input from '@/components/ui/Input';
-import Loader from '@/components/ui/Loader';
 import { getCategories } from '@/services/category.service';
 import { getCollections } from '@/services/collection.service';
 import { getProducts } from '@/services/product.service';
@@ -34,6 +35,9 @@ function Shop() {
       collection: searchParams.get('collection') || 'all',
       minPrice: searchParams.get('minPrice') || '',
       maxPrice: searchParams.get('maxPrice') || '',
+      inStock: searchParams.get('inStock') === 'true',
+      featured: searchParams.get('featured') === 'true',
+      new: searchParams.get('new') === 'true',
       sort: searchParams.get('sort') || 'featured',
       page: Number(searchParams.get('page') || 1),
     }),
@@ -85,6 +89,9 @@ function Shop() {
         if (filters.collection !== 'all') params.collection = filters.collection;
         if (filters.minPrice) params.minPrice = filters.minPrice;
         if (filters.maxPrice) params.maxPrice = filters.maxPrice;
+        if (filters.inStock) params.inStock = 'true';
+        if (filters.featured) params.featured = 'true';
+        if (filters.new) params.new = 'true';
 
         const data = await getProducts(params);
 
@@ -202,6 +209,10 @@ function Shop() {
             <fieldset className="mt-8 border-t border-matte-black/10 pt-6">
               <legend className="text-sm font-semibold text-matte-black">Price</legend>
               <div className="mt-4 grid grid-cols-2 gap-3">
+                <input type="range" min="0" max="100000" step="500" value={filters.minPrice || 0} onChange={(event) => updateFilter('minPrice', event.target.value === '0' ? '' : event.target.value)} aria-label="Minimum price slider" className="accent-champagne-gold" />
+                <input type="range" min="0" max="100000" step="500" value={filters.maxPrice || 100000} onChange={(event) => updateFilter('maxPrice', event.target.value === '100000' ? '' : event.target.value)} aria-label="Maximum price slider" className="accent-champagne-gold" />
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-3">
                 <Input
                   id="min-price"
                   type="number"
@@ -221,6 +232,11 @@ function Shop() {
                   aria-label="Maximum price"
                 />
               </div>
+            </fieldset>
+
+            <fieldset className="mt-8 space-y-3 border-t border-matte-black/10 pt-6">
+              <legend className="text-sm font-semibold text-matte-black">Availability & highlights</legend>
+              {[['inStock', 'In stock'], ['featured', 'Featured'], ['new', 'New arrivals']].map(([key, label]) => <label key={key} className="flex cursor-pointer items-center gap-3 text-sm text-matte-black/70"><input type="checkbox" checked={filters[key]} onChange={(event) => updateFilter(key, event.target.checked ? 'true' : '')} className="accent-champagne-gold" />{label}</label>)}
             </fieldset>
           </aside>
 
@@ -268,34 +284,12 @@ function Shop() {
             )}
 
             {loading ? (
-              <div className="flex min-h-96 items-center justify-center">
-                <Loader label="Loading products" />
-              </div>
+              <ProductGridSkeleton />
             ) : (
               <ProductGrid products={products} />
             )}
 
-            {meta.totalPages > 1 && (
-              <div className="mt-10 flex justify-center gap-2">
-                {Array.from({ length: meta.totalPages }, (_, index) => index + 1).map(
-                  (number) => (
-                    <button
-                      key={number}
-                      type="button"
-                      onClick={() => updateFilter('page', String(number))}
-                      className={`h-10 w-10 border text-sm font-semibold ${
-                        meta.page === number
-                          ? 'border-matte-black bg-matte-black text-ivory-white'
-                          : 'border-matte-black/15 text-matte-black hover:border-champagne-gold'
-                      }`}
-                      aria-label={`Go to page ${number}`}
-                    >
-                      {number}
-                    </button>
-                  )
-                )}
-              </div>
-            )}
+            <Pagination meta={meta} onPageChange={(page) => updateFilter('page', String(page))} />
           </div>
         </div>
       </Container>

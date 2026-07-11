@@ -6,3 +6,4 @@ export { default as Loader } from './Loader';
 export { default as Container } from './Container';
 export { default as Section } from './Section';
 export { default as Typography } from './Typography';
+export { default as EmptyState } from './EmptyState';

@@ -4,6 +4,7 @@ import MainLayout from '@/layouts/MainLayout';
 import AuthLayout from '@/layouts/AuthLayout';
 import AdminLayout from '@/layouts/AdminLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import AdminRoute from '@/components/AdminRoute';
 import Cart from '@/pages/Cart';
 import Checkout from '@/pages/Checkout';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -13,12 +14,19 @@ import Orders from '@/pages/Orders';
 import Profile from '@/pages/Profile';
 import Register from '@/pages/Register';
 import ResetPassword from '@/pages/ResetPassword';
+import Wishlist from '@/pages/Wishlist';
 import About from '@/pages/public/About';
 import Contact from '@/pages/public/Contact';
 import Home from '@/pages/public/Home';
 import NotFound from '@/pages/public/NotFound';
 import ProductDetails from '@/pages/public/ProductDetails';
 import Shop from '@/pages/public/Shop';
+import Search from '@/pages/public/Search';
+import Dashboard from '@/pages/admin/Dashboard';
+import AdminProducts from '@/pages/admin/Products';
+import AdminOrders from '@/pages/admin/Orders';
+import TaxonomyPage from '@/pages/admin/TaxonomyPage';
+import AdminUsers from '@/pages/admin/Users';
 
 /**
  * router/index.jsx
@@ -45,6 +53,10 @@ const router = createBrowserRouter([
         element: <ProductDetails />,
       },
       {
+        path: 'search',
+        element: <Search />,
+      },
+      {
         path: 'about',
         element: <About />,
       },
@@ -62,6 +74,10 @@ const router = createBrowserRouter([
           {
             path: 'cart',
             element: <Cart />,
+          },
+          {
+            path: 'wishlist',
+            element: <Wishlist />,
           },
           {
             path: 'checkout',
@@ -106,9 +122,16 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: '/admin',
-    element: <AdminLayout />,
-    children: [],
+    element: <AdminRoute />,
+    children: [{ path: '/admin', element: <AdminLayout />, children: [
+      { index: true, element: <Dashboard /> },
+      { path: 'dashboard', element: <Dashboard /> },
+      { path: 'products', element: <AdminProducts /> },
+      { path: 'orders', element: <AdminOrders /> },
+      { path: 'users', element: <AdminUsers /> },
+      { path: 'categories', element: <TaxonomyPage type="categories" title="Categories" /> },
+      { path: 'collections', element: <TaxonomyPage type="collections" title="Collections" /> },
+    ] }],
   },
 ]);
 

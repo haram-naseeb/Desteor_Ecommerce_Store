@@ -28,15 +28,19 @@ function LoginForm() {
     setSuccess('');
 
     try {
-      await login(values);
+      const user = await login(values);
       setSuccess('Welcome back to DESTEOR.');
-      const redirectTo = `${location.state?.from?.pathname || ROUTES.HOME}${
-        location.state?.from?.search || ''
-      }`;
+      const redirectTo =
+        user.role === 'ADMIN'
+          ? ROUTES.ADMIN.DASHBOARD
+          : `${location.state?.from?.pathname || ROUTES.HOME}${location.state?.from?.search || ''}`;
       navigate(redirectTo, {
         replace: true,
-        state: location.state?.pendingCartItem
-          ? { pendingCartItem: location.state.pendingCartItem }
+        state: location.state?.pendingCartItem || location.state?.pendingWishlistProductId
+          ? {
+              pendingCartItem: location.state.pendingCartItem,
+              pendingWishlistProductId: location.state.pendingWishlistProductId,
+            }
           : undefined,
       });
     } catch (error) {
@@ -69,20 +73,31 @@ function LoginForm() {
         />
       </div>
       <div className="mt-5 flex items-center justify-between gap-4 text-sm">
-        <label className="flex items-center gap-2 text-matte-black/62">
+        <label className="text-matte-black/62 flex items-center gap-2">
           <input type="checkbox" className="accent-champagne-gold" />
           Remember me
         </label>
-        <Link to={ROUTES.FORGOT_PASSWORD} className="text-matte-black hover:text-champagne-gold">
+        <Link
+          to={ROUTES.FORGOT_PASSWORD}
+          className="text-matte-black hover:text-champagne-gold"
+        >
           Forgot password?
         </Link>
       </div>
-      <Button type="submit" variant="secondary" className="mt-7 w-full rounded-none" disabled={isSubmitting}>
+      <Button
+        type="submit"
+        variant="secondary"
+        className="mt-7 w-full rounded-none"
+        disabled={isSubmitting}
+      >
         {isSubmitting ? <Loader size="sm" label="Logging in" /> : 'Login'}
       </Button>
-      <p className="mt-6 text-center text-sm text-matte-black/62">
+      <p className="text-matte-black/62 mt-6 text-center text-sm">
         New to DESTEOR?{' '}
-        <Link to={ROUTES.REGISTER} className="font-semibold text-matte-black hover:text-champagne-gold">
+        <Link
+          to={ROUTES.REGISTER}
+          className="font-semibold text-matte-black hover:text-champagne-gold"
+        >
           Create an account
         </Link>
       </p>

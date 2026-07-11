@@ -224,3 +224,42 @@ Returns the authenticated user's orders, newest first.
 **`GET /api/orders/:id`**
 
 Returns one order if it belongs to the authenticated user.
+# Sprint 7A: Admin API
+
+## Sprint 7B additions
+
+- `POST /api/admin/upload` accepts up to eight JPEG, PNG, or WebP images in `images` multipart fields (5 MB each) and returns Cloudinary URLs and public IDs.
+- `DELETE /api/admin/upload` removes a Cloudinary asset with `{ "publicId" }`.
+- `GET /api/admin/users`, `PATCH /api/admin/users/:id/role`, and `DELETE /api/admin/users/:id` provide protected user management.
+- `GET|PATCH /api/admin/profile` exposes the signed-in administrator profile. Password updates require at least eight characters.
+
+Product, order, and user lists accept `page` and `limit`; product lists also accept search, taxonomy, featured, stock, and sort filters. Orders accept search, status, and date sort filters.
+
+All admin endpoints require a valid bearer token for a user with the `ADMIN` role. A non-admin authenticated user receives `403`.
+
+- `GET /api/admin/dashboard` — dashboard totals and order counts by status.
+- `GET|POST /api/admin/products`, `GET|PUT|DELETE /api/admin/products/:id` — product administration, including Cloudinary-backed image records and specifications. Product images must first be uploaded through the protected multipart upload endpoint; the client never submits manually entered image URLs.
+- `GET|POST /api/admin/categories`, `PUT|DELETE /api/admin/categories/:id` — category administration. Deletion returns `409` when products exist.
+- `GET|POST /api/admin/collections`, `PUT|DELETE /api/admin/collections/:id` — collection administration. Deletion returns `409` when products exist.
+- `GET /api/admin/orders`, `GET /api/admin/orders/:id`, `PATCH /api/admin/orders/:id/status` — order administration. Status changes only follow the fulfilment sequence; cancellation is allowed before delivery.
+
+Requests retain the standard `{ success, data, message? }` response envelope. Invalid input returns `422` with an `errors` object.
+# Sprint 8: Shopping Experience
+
+## Wishlist
+
+Authenticated wishlist endpoints are available under `/api/wishlist`:
+
+- `GET /api/wishlist` returns the current customer's wishlist and normalized product records.
+- `POST /api/wishlist/items` accepts `{ "productId": "..." }` and adds a product.
+- `DELETE /api/wishlist/items/:productId` removes a product.
+
+## Reviews
+
+- `GET /api/products/:productId/reviews` returns `reviews`, `averageRating`, and `reviewCount`.
+- `POST /api/products/:productId/reviews` creates the authenticated customer's review.
+- `PATCH /api/products/reviews/:id` and `DELETE /api/products/reviews/:id` only allow the review owner.
+
+## Catalog Query
+
+`GET /api/products` supports `search`, `category`, `collection`, `minPrice`, `maxPrice`, `inStock`, `featured`, `new`, `sort`, `page`, and `limit`. Responses include pagination metadata: `total`, `page`, `limit`, `totalPages`, `hasNextPage`, and `hasPreviousPage`.

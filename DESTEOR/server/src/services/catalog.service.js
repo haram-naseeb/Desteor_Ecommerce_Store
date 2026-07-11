@@ -10,6 +10,8 @@ const SORT_OPTIONS = {
   'price-low': [{ salePrice: 'asc' }, { price: 'asc' }],
   'price-high': [{ salePrice: 'desc' }, { price: 'desc' }],
   name: [{ name: 'asc' }],
+  'name-desc': [{ name: 'desc' }],
+  oldest: [{ createdAt: 'asc' }],
 };
 
 function toPositiveInteger(value, fallback, max = Number.MAX_SAFE_INTEGER) {
@@ -85,6 +87,10 @@ function createProductWhere(query, overrides = {}) {
     if (query.minPrice) where.price.gte = Number(query.minPrice);
     if (query.maxPrice) where.price.lte = Number(query.maxPrice);
   }
+
+  if (query.inStock === 'true') where.stock = { gt: 0 };
+  if (query.featured === 'true') where.featured = true;
+  if (query.new === 'true') where.createdAt = { gte: new Date(Date.now() - 1000 * 60 * 60 * 24 * 90) };
 
   return where;
 }

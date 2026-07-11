@@ -6,9 +6,6 @@ const REFRESH_TOKEN_KEY = 'desteor_refresh_token';
 
 const api = axios.create({
   baseURL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
   withCredentials: true,
 });
 

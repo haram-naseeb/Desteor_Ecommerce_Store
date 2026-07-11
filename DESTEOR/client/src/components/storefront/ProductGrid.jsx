@@ -1,15 +1,10 @@
 import ProductCard from '@/components/storefront/ProductCard';
+import EmptyState from '@/components/ui/EmptyState';
+import { ROUTES } from '@/constants/routes';
 
 function ProductGrid({ products }) {
   if (!products.length) {
-    return (
-      <div className="border border-matte-black/10 bg-white/50 p-10 text-center">
-        <p className="font-heading text-2xl text-matte-black">No pieces found</p>
-        <p className="mt-3 text-sm text-matte-black/60">
-          Try a different search term or filter combination.
-        </p>
-      </div>
-    );
+    return <EmptyState title="No pieces found" description="Try a different search term or filter combination." actionLabel="Browse all pieces" actionTo={ROUTES.SHOP} />;
   }
 
   return (

@@ -1,0 +1,9 @@
+const prisma = require('../config/db');
+const reviewInclude = { user: { select: { firstName: true, lastName: true } } };
+const findReviews = (productId) => prisma.review.findMany({ where: { productId }, include: reviewInclude, orderBy: { createdAt: 'desc' } });
+const reviewSummary = (productId) => prisma.review.aggregate({ where: { productId }, _avg: { rating: true }, _count: { _all: true } });
+const findReview = (id) => prisma.review.findUnique({ where: { id }, include: reviewInclude });
+const createReview = (data) => prisma.review.create({ data, include: reviewInclude });
+const updateReview = (id, data) => prisma.review.update({ where: { id }, data, include: reviewInclude });
+const deleteReview = (id) => prisma.review.delete({ where: { id } });
+module.exports = { findReviews, reviewSummary, findReview, createReview, updateReview, deleteReview };

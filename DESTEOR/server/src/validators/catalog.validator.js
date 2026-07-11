@@ -1,4 +1,4 @@
-const SORT_OPTIONS = ['featured', 'newest', 'price-low', 'price-high', 'name'];
+const SORT_OPTIONS = ['featured', 'newest', 'oldest', 'price-low', 'price-high', 'name', 'name-desc'];
 
 function sendValidationErrors(res, errors) {
   return res.status(422).json({
@@ -19,7 +19,7 @@ function isNonNegativeNumber(value) {
 }
 
 function validateCatalogQuery(req, res, next) {
-  const { page, limit, minPrice, maxPrice, sort } = req.query;
+  const { page, limit, minPrice, maxPrice, sort, inStock, featured, new: isNew } = req.query;
   const errors = {};
 
   if (!isPositiveInteger(page)) errors.page = 'Page must be a positive integer.';
@@ -36,6 +36,7 @@ function validateCatalogQuery(req, res, next) {
   if (sort && !SORT_OPTIONS.includes(sort)) {
     errors.sort = `Sort must be one of: ${SORT_OPTIONS.join(', ')}.`;
   }
+  for (const [key, value] of Object.entries({ inStock, featured, new: isNew })) if (value !== undefined && !['true', 'false'].includes(value)) errors[key] = 'Must be true or false.';
 
   if (Object.keys(errors).length) return sendValidationErrors(res, errors);
   next();

@@ -15,6 +15,11 @@ const FOCUSABLE_SELECTOR =
  */
 function Modal({ isOpen, onClose, title, children }) {
   const containerRef = useRef(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -24,7 +29,7 @@ function Modal({ isOpen, onClose, title, children }) {
 
     function handleKeyDown(event) {
       if (event.key === 'Escape') {
-        onClose?.();
+        onCloseRef.current?.();
         return;
       }
 
@@ -50,7 +55,7 @@ function Modal({ isOpen, onClose, title, children }) {
       document.removeEventListener('keydown', handleKeyDown);
       previouslyFocused?.focus?.();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   return createPortal(
     <AnimatePresence>
