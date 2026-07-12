@@ -6,7 +6,7 @@ import { ROUTES } from '@/constants/routes';
 function Footer() {
   return (
     <footer className="bg-matte-black text-ivory-white">
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <p className="font-heading text-2xl tracking-[0.35em]">{APP_NAME}</p>
           <p className="mt-3 max-w-sm text-sm leading-7 text-ivory-white/65">

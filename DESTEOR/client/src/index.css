@@ -9,6 +9,14 @@
 
   body {
     @apply bg-ivory-white text-matte-black font-body antialiased;
+    background-image:
+      radial-gradient(circle at top, rgba(198, 161, 91, 0.08), transparent 28%),
+      linear-gradient(180deg, rgba(250, 247, 242, 0.94) 0%, #faf7f2 55%, #f4eee6 100%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    @apply bg-champagne-gold text-matte-black;
   }
 
   h1,
@@ -19,4 +27,42 @@
   h6 {
     @apply font-heading tracking-wide;
   }
+
+  a {
+    @apply transition-colors duration-300;
+  }
+
+  button:not(:disabled),
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  select,
+  textarea {
+    @apply transition-all duration-300;
+  }
+
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  select,
+  textarea {
+    @apply rounded-xl border border-matte-black/15 bg-ivory-white/95 px-4 py-3 text-sm text-matte-black shadow-sm outline-none placeholder:text-matte-black/35 focus:border-champagne-gold focus:ring-4 focus:ring-champagne-gold/10;
+  }
+
+  select {
+    @apply pr-10;
+  }
+
+  textarea {
+    @apply min-h-28;
+  }
+}
+
+input.header-search,
+input.header-search:focus,
+input.header-search:-webkit-autofill,
+input.header-search:-webkit-autofill:hover,
+input.header-search:-webkit-autofill:focus {
+  background-color: transparent !important;
+  color: #fff !important;
+  caret-color: #fff;
+  -webkit-text-fill-color: #fff;
+  -webkit-box-shadow: 0 0 0 1000px transparent inset;
+  box-shadow: 0 0 0 1000px transparent inset;
 }

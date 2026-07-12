@@ -18,13 +18,31 @@ const routes = require('./routes');
 
 const app = express();
 
+// Allowed frontend origins
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://desteor-ecommerce-store.vercel.app',
+];
+
 // --- Core middleware ---
 app.use(
   cors({
-    origin: env.CLIENT_URL,
+    origin(origin, callback) {
+      // Allow requests from Postman, curl, etc.
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);

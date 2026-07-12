@@ -19,7 +19,7 @@ function NotFound() {
           graceful return.
         </p>
         <Link to={ROUTES.HOME} className="mt-8 inline-block">
-          <Button variant="secondary" size="lg" className="rounded-none">
+          <Button variant="secondary" size="lg">
             Return Home
           </Button>
         </Link>

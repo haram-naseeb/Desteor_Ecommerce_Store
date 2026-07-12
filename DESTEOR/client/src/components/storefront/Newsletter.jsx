@@ -1,4 +1,4 @@
-import { FiSend } from 'react-icons/fi';
+import { Send } from 'lucide-react';
 
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -25,8 +25,8 @@ function Newsletter() {
             aria-label="Email address"
             className="border-ivory-white/20 bg-ivory-white text-matte-black"
           />
-          <Button type="submit" variant="secondary" className="gap-2 rounded-none">
-            <FiSend aria-hidden="true" />
+          <Button type="submit" variant="secondary" className="gap-2">
+            <Send className="h-4 w-4" aria-hidden="true" />
             Subscribe
           </Button>
         </form>

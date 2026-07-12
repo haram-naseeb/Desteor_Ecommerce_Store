@@ -96,7 +96,7 @@ function Checkout() {
               Add a piece to your cart before placing an order.
             </p>
             <Link to={ROUTES.SHOP} className="mt-7 inline-block">
-              <Button variant="secondary" className="rounded-none">
+              <Button variant="secondary">
                 Continue Shopping
               </Button>
             </Link>
@@ -160,13 +160,7 @@ function Checkout() {
                 {error}
               </div>
             )}
-            <Button
-              type="button"
-              variant="secondary"
-              className="mt-6 w-full rounded-none"
-              disabled={placing}
-              onClick={handlePlaceOrder}
-            >
+            <Button type="button" variant="secondary" className="mt-6 w-full" disabled={placing} onClick={handlePlaceOrder}>
               {placing ? <Loader size="sm" label="Placing order" /> : 'Place Order'}
             </Button>
             <Link

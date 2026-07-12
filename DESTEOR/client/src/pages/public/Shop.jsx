@@ -245,21 +245,21 @@ function Shop() {
               <div className="relative">
                 <FiSearch
                   aria-hidden="true"
-                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-matte-black/40"
+                  className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-matte-black/40"
                 />
                 <Input
                   id="shop-search"
                   placeholder="Search necklaces, earrings, rings..."
                   value={filters.search}
                   onChange={(event) => updateFilter('search', event.target.value)}
-                  className="pl-11"
+                  className="pl-4 pr-11"
                   aria-label="Search products"
                 />
               </div>
               <select
                 value={filters.sort}
                 onChange={(event) => updateFilter('sort', event.target.value)}
-                className="h-[46px] rounded-md border border-matte-black/20 bg-ivory-white px-4 text-sm text-matte-black focus:outline-none focus:ring-2 focus:ring-champagne-gold"
+                className="h-[46px] rounded-xl border border-matte-black/15 bg-ivory-white/95 px-4 text-sm text-matte-black shadow-sm focus:outline-none focus:ring-4 focus:ring-champagne-gold/12"
                 aria-label="Sort products"
               >
                 <option value="featured">Featured</option>

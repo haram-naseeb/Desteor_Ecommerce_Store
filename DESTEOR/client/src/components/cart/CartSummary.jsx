@@ -1,4 +1,4 @@
-import { FiArrowRight } from 'react-icons/fi';
+import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import Button from '@/components/ui/Button';
@@ -18,7 +18,7 @@ function CartSummary({ summary, disabled }) {
   const navigate = useNavigate();
 
   return (
-    <aside className="h-fit border border-matte-black/10 bg-white p-6">
+    <aside className="h-fit rounded-2xl border border-matte-black/10 bg-white/90 p-6 shadow-subtle">
       <h2 className="font-heading text-2xl text-matte-black">Cart Summary</h2>
       <div className="mt-6 space-y-4">
         <SummaryLine label="Items" value={summary.totalItems} />
@@ -35,11 +35,11 @@ function CartSummary({ summary, disabled }) {
       <Button
         type="button"
         variant="secondary"
-        className="mt-6 w-full rounded-none"
+        className="mt-6 w-full"
         disabled={disabled || summary.totalItems < 1}
         onClick={() => navigate(ROUTES.CHECKOUT)}
       >
-        Checkout <FiArrowRight className="ml-2" aria-hidden="true" />
+        Checkout <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
       </Button>
     </aside>
   );

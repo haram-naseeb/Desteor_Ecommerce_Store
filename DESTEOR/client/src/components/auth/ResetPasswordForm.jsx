@@ -71,7 +71,7 @@ function ResetPasswordForm() {
           })}
         />
       </div>
-      <Button type="submit" variant="secondary" className="mt-7 w-full rounded-none" disabled={isSubmitting}>
+      <Button type="submit" variant="secondary" className="mt-7 w-full" disabled={isSubmitting}>
         {isSubmitting ? <Loader size="sm" label="Resetting password" /> : 'Reset Password'}
       </Button>
       <p className="mt-6 text-center text-sm text-matte-black/62">

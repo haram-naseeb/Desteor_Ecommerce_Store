@@ -84,12 +84,7 @@ function LoginForm() {
           Forgot password?
         </Link>
       </div>
-      <Button
-        type="submit"
-        variant="secondary"
-        className="mt-7 w-full rounded-none"
-        disabled={isSubmitting}
-      >
+      <Button type="submit" variant="secondary" className="mt-7 w-full" disabled={isSubmitting}>
         {isSubmitting ? <Loader size="sm" label="Logging in" /> : 'Login'}
       </Button>
       <p className="text-matte-black/62 mt-6 text-center text-sm">

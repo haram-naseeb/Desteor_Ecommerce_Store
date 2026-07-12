@@ -28,11 +28,11 @@ const Input = forwardRef(function Input(
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${id}-error` : undefined}
         className={`
-          w-full rounded-md border bg-ivory-white px-4 py-2.5 font-body text-sm
-          text-matte-black placeholder:text-matte-black/40
-          focus:outline-none focus:ring-2 focus:ring-champagne-gold
+          w-full rounded-xl border bg-ivory-white/95 px-4 py-3 font-body text-sm
+          text-matte-black shadow-sm placeholder:text-matte-black/35
+          focus:outline-none focus:ring-4 focus:ring-champagne-gold/12
           disabled:cursor-not-allowed disabled:opacity-50
-          ${error ? 'border-red-400' : 'border-matte-black/20'}
+          ${error ? 'border-red-400' : 'border-matte-black/15'}
           ${className}
         `}
         {...rest}

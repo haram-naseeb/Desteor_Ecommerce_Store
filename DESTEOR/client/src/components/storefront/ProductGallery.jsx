@@ -15,11 +15,11 @@ function ProductGallery({ product }) {
 
   return (
     <div className="grid gap-4">
-      <div className="aspect-[4/5] overflow-hidden bg-matte-black/5">
+      <div className="aspect-[4/5] overflow-hidden rounded-3xl border border-matte-black/10 bg-matte-black/5 shadow-elevated">
         <img
           src={activeImage}
           alt={product.name}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover transition duration-500 hover:scale-105"
         />
       </div>
       <div className="grid grid-cols-3 gap-3">
@@ -30,12 +30,12 @@ function ProductGallery({ product }) {
             onClick={() => setActiveImage(image)}
             className={`aspect-square overflow-hidden border ${
               activeImage === image
-                ? 'border-champagne-gold'
-                : 'border-matte-black/10 hover:border-matte-black/30'
+                ? 'border-champagne-gold shadow-elevated'
+                : 'border-matte-black/10 hover:border-champagne-gold/40 hover:shadow-md'
             }`}
             aria-label={`View ${product.name} image`}
           >
-            <img src={image} alt="" className="h-full w-full object-cover" />
+            <img src={image} alt="" className="h-full w-full object-cover transition duration-500 hover:scale-105" />
           </button>
         ))}
       </div>

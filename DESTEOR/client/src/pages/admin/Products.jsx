@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Edit2, Filter, ImagePlus, Plus, Search, Trash2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 import Loader from '@/components/ui/Loader';
 import Modal from '@/components/ui/Modal';
 import {
@@ -148,49 +150,52 @@ function Products() {
           </p>
           <h1 className="font-heading text-3xl">Products</h1>
         </div>
-        <Button
-          onClick={() => setRecord({ ...emptyProduct, images: [], specifications: [] })}
-        >
+        <Button onClick={() => setRecord({ ...emptyProduct, images: [], specifications: [] })}>
+          <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
           Add product
         </Button>
       </div>
-      <div className="mb-4 flex gap-2">
-        <input
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          onKeyDown={(event) => event.key === 'Enter' && load(search)}
-          placeholder="Search products"
-          className="border border-matte-black/20 px-3 py-2"
-        />
+      <div className="mb-5 flex flex-wrap gap-3 rounded-2xl border border-matte-black/10 bg-white/80 p-4 shadow-subtle">
+        <div className="relative min-w-64 flex-1">
+          <Search className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-matte-black/35" aria-hidden="true" />
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            onKeyDown={(event) => event.key === 'Enter' && load(search)}
+            placeholder="Search products"
+            className="w-full rounded-xl border border-matte-black/15 bg-ivory-white/95 py-3 pl-4 pr-11 text-sm shadow-sm"
+          />
+        </div>
         <Button size="sm" onClick={() => load(search)}>
+          <Filter className="mr-2 h-4 w-4" aria-hidden="true" />
           Search
         </Button>
       </div>
       {error && <p className="mb-4 text-red-700">{error}</p>}
-      <div className="overflow-x-auto border border-matte-black/10 bg-white">
+      <div className="overflow-hidden rounded-2xl border border-matte-black/10 bg-white/90 shadow-subtle">
         <table className="w-full text-left font-body text-sm">
           <thead className="bg-matte-black text-ivory-white">
             <tr>
               {['Product', 'Category', 'Price', 'Stock', 'Featured', 'Actions'].map(
                 (heading) => (
-                  <th key={heading} className="p-4">
+                  <th key={heading} className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.2em]">
                     {heading}
                   </th>
                 )
               )}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-matte-black/8">
             {data.products.map((item) => (
-              <tr key={item.id} className="border-t">
-                <td className="p-4">{item.name}</td>
-                <td className="p-4">{item.category.name}</td>
-                <td className="p-4">{formatCurrency(item.price)}</td>
-                <td className="p-4">{item.stock}</td>
-                <td className="p-4">{item.featured ? 'Yes' : 'No'}</td>
-                <td className="p-4">
+              <tr key={item.id} className="transition hover:bg-champagne-gold/6">
+                <td className="px-5 py-4 font-medium text-matte-black">{item.name}</td>
+                <td className="px-5 py-4 text-matte-black/70">{item.category.name}</td>
+                <td className="px-5 py-4 text-matte-black/70">{formatCurrency(item.price)}</td>
+                <td className="px-5 py-4 text-matte-black/70">{item.stock}</td>
+                <td className="px-5 py-4 text-matte-black/70">{item.featured ? 'Yes' : 'No'}</td>
+                <td className="px-5 py-4">
                   <button
-                    className="mr-3 text-champagne-gold"
+                    className="mr-3 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-champagne-gold transition hover:bg-champagne-gold/10"
                     onClick={() =>
                       setRecord({
                         ...item,
@@ -199,9 +204,11 @@ function Products() {
                       })
                     }
                   >
+                    <Edit2 className="h-4 w-4" aria-hidden="true" />
                     Edit
                   </button>
-                  <button className="text-red-700" onClick={() => remove(item.id)}>
+                  <button className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-red-700 transition hover:bg-red-50" onClick={() => remove(item.id)}>
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
                     Delete
                   </button>
                 </td>
@@ -215,19 +222,18 @@ function Products() {
         onClose={closeModal}
         title={`${record?.id ? 'Edit' : 'Add'} product`}
       >
-        <form onSubmit={submit} className="max-h-[70vh] space-y-3 overflow-y-auto pr-2">
+        <form onSubmit={submit} className="max-h-[70vh] space-y-4 overflow-y-auto pr-2">
           {['name', 'slug', 'description'].map((field) => (
-            <input
+            <Input
               key={field}
               required
               value={record?.[field] || ''}
               placeholder={field}
               onChange={(event) => setRecord({ ...record, [field]: event.target.value })}
-              className="w-full border border-matte-black/20 px-3 py-2"
             />
           ))}
           <div className="grid grid-cols-2 gap-3">
-            <input
+            <Input
               required
               type="number"
               min="0"
@@ -235,9 +241,8 @@ function Products() {
               onChange={(event) =>
                 setRecord({ ...record, price: Number(event.target.value) })
               }
-              className="border px-3 py-2"
             />
-            <input
+            <Input
               required
               type="number"
               min="0"
@@ -245,14 +250,13 @@ function Products() {
               onChange={(event) =>
                 setRecord({ ...record, stock: Number(event.target.value) })
               }
-              className="border px-3 py-2"
             />
           </div>
           <select
             required
             value={record?.categoryId || ''}
             onChange={(event) => setRecord({ ...record, categoryId: event.target.value })}
-            className="w-full border px-3 py-2"
+            className="w-full"
           >
             <option value="">Choose category</option>
             {categories.map((item) => (
@@ -267,7 +271,7 @@ function Products() {
             onChange={(event) =>
               setRecord({ ...record, collectionId: event.target.value })
             }
-            className="w-full border px-3 py-2"
+            className="w-full"
           >
             <option value="">Choose collection</option>
             {collections.map((item) => (
@@ -276,7 +280,7 @@ function Products() {
               </option>
             ))}
           </select>
-          <label className="flex gap-2 text-sm">
+          <label className="flex items-center gap-3 rounded-xl border border-matte-black/10 bg-white/70 px-4 py-3 text-sm shadow-sm">
             <input
               type="checkbox"
               checked={record?.featured || false}
@@ -287,7 +291,7 @@ function Products() {
             Featured
           </label>
           <section>
-            <p className="mb-2 font-body text-sm font-medium">Product images</p>
+            <p className="mb-2 font-body text-sm font-medium text-matte-black">Product images</p>
             <input
               ref={fileInputRef}
               type="file"
@@ -307,8 +311,9 @@ function Products() {
                 event.preventDefault();
                 uploadFiles(event.dataTransfer.files);
               }}
-              className="flex w-full flex-col items-center justify-center border border-dashed border-matte-black/30 bg-ivory-white px-5 py-7 font-body text-sm text-matte-black transition hover:border-champagne-gold"
+              className="flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-matte-black/20 bg-ivory-white px-5 py-8 font-body text-sm text-matte-black shadow-sm transition hover:border-champagne-gold hover:bg-champagne-gold/5"
             >
+              <ImagePlus className="mb-2 h-5 w-5 text-champagne-gold" aria-hidden="true" />
               <span className="font-medium">Choose images</span>
               <span className="mt-1 text-xs text-matte-black/60">
                 or drag and drop JPEG, PNG, or WebP files here (max 5 MB each)
@@ -321,7 +326,7 @@ function Products() {
               {record?.images.map((image, index) => (
                 <div
                   key={image.id || image.publicId || image.url}
-                  className="relative overflow-hidden border border-matte-black/10 bg-white"
+                  className="relative overflow-hidden rounded-2xl border border-matte-black/10 bg-white shadow-sm"
                 >
                   <img
                     src={image.url}
@@ -331,7 +336,7 @@ function Products() {
                   <button
                     type="button"
                     onClick={() => removeImage(image)}
-                    className="absolute right-2 top-2 bg-matte-black px-2 py-1 text-xs text-ivory-white"
+                    className="absolute right-2 top-2 rounded-full bg-matte-black/88 px-3 py-1 text-xs text-ivory-white shadow-lg"
                   >
                     Remove
                   </button>
@@ -357,10 +362,10 @@ function Products() {
                     }),
                 })
               }
-              className="mt-1 w-full border px-3 py-2"
+              className="mt-1 w-full rounded-xl border border-matte-black/15 bg-ivory-white/95 px-4 py-3 text-sm shadow-sm"
             />
           </label>
-          <Button type="submit" disabled={uploading}>
+          <Button type="submit" disabled={uploading} className="w-full">
             {uploading ? 'Uploading…' : 'Save product'}
           </Button>
         </form>

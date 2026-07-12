@@ -67,7 +67,7 @@ function Cart() {
               occasion.
             </p>
             <Link to={ROUTES.SHOP} className="mt-7 inline-block">
-              <Button variant="secondary" className="rounded-none">
+              <Button variant="secondary">
                 Continue Shopping
               </Button>
             </Link>

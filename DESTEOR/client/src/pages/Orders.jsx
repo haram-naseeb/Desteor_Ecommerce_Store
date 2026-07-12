@@ -74,7 +74,7 @@ function Orders() {
               Your placed orders will appear here.
             </p>
             <Link to={ROUTES.SHOP} className="mt-7 inline-block">
-              <Button variant="secondary" className="rounded-none">
+              <Button variant="secondary">
                 Shop Collection
               </Button>
             </Link>

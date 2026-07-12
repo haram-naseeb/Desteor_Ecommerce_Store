@@ -74,7 +74,7 @@ function Modal({ isOpen, onClose, title, children }) {
             aria-modal="true"
             aria-label={title}
             tabIndex={-1}
-            className="w-full max-w-lg rounded-card bg-ivory-white p-6 shadow-elevated focus:outline-none"
+            className="w-full max-w-lg rounded-2xl border border-matte-black/10 bg-ivory-white/98 p-6 shadow-glow backdrop-blur-sm focus:outline-none"
             initial={{ opacity: 0, y: 16, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}

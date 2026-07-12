@@ -1,17 +1,18 @@
 import { motion } from 'framer-motion';
 
 const VARIANT_CLASSES = {
-  primary: 'bg-matte-black text-ivory-white hover:bg-matte-black/90',
+  primary:
+    'bg-matte-black text-ivory-white shadow-sm hover:bg-matte-black/90 hover:shadow-lg',
   secondary:
-    'bg-champagne-gold text-matte-black hover:bg-champagne-gold-light',
+    'bg-champagne-gold text-matte-black shadow-sm hover:bg-champagne-gold-light hover:shadow-lg',
   ghost:
-    'bg-transparent text-matte-black border border-matte-black/20 hover:border-matte-black/40',
+    'border border-matte-black/15 bg-white/60 text-matte-black hover:border-champagne-gold hover:bg-white',
 };
 
 const SIZE_CLASSES = {
-  sm: 'px-4 py-2 text-sm',
-  md: 'px-6 py-3 text-sm',
-  lg: 'px-8 py-4 text-base',
+  sm: 'px-4 py-2.5 text-sm',
+  md: 'px-5 py-3 text-sm',
+  lg: 'px-7 py-4 text-base',
 };
 
 /**
@@ -40,8 +41,9 @@ function Button({
       whileHover={{ scale: disabled ? 1 : 1.02 }}
       transition={{ duration: 0.15 }}
       className={`
-        inline-flex items-center justify-center rounded-full font-body font-medium
-        tracking-wide transition-colors duration-200
+        inline-flex items-center justify-center rounded-xl font-body font-medium
+        tracking-wide shadow-sm ring-0 transition-all duration-300
+        focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-champagne-gold/20
         disabled:cursor-not-allowed disabled:opacity-50
         ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]} ${className}
       `}

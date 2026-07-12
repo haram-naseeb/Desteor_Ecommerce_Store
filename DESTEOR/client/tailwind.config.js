@@ -16,9 +16,10 @@ export default {
       boxShadow: {
         subtle: '0 2px 12px rgba(13, 13, 13, 0.08)',
         elevated: '0 8px 30px rgba(13, 13, 13, 0.12)',
+        glow: '0 16px 50px rgba(13, 13, 13, 0.16)',
       },
       borderRadius: {
-        card: '0.75rem',
+        card: '1rem',
       },
     },
   },

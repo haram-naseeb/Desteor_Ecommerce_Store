@@ -12,7 +12,7 @@ import Navbar from '@/components/layout/Navbar';
  */
 function MainLayout() {
   return (
-    <div className="flex min-h-screen flex-col bg-ivory-white">
+    <div className="flex min-h-screen flex-col bg-transparent">
       <Navbar />
 
       <main className="flex-1">

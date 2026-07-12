@@ -28,7 +28,7 @@ function AuthLayout() {
           </span>
         </Link>
 
-        <div className="border border-champagne-gold/25 bg-ivory-white p-7 shadow-elevated md:p-8">
+        <div className="rounded-2xl border border-champagne-gold/20 bg-ivory-white/98 p-7 shadow-glow backdrop-blur-sm md:p-8">
           <Outlet />
         </div>
       </motion.div>

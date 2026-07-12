@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { FiHeart, FiShield, FiShoppingBag, FiTruck } from 'react-icons/fi';
+import { Heart, Shield, ShoppingBag, Truck } from 'lucide-react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import Breadcrumbs from '@/components/storefront/Breadcrumbs';
@@ -196,7 +196,7 @@ function ProductDetails() {
           {error || 'This design may have moved or left the collection.'}
         </p>
         <Link to={ROUTES.SHOP} className="mt-8 inline-block">
-          <Button variant="secondary" className="rounded-none">
+          <Button variant="secondary">
             Return to Shop
           </Button>
         </Link>
@@ -260,8 +260,8 @@ function ProductDetails() {
           )}
 
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
-            <div className="border border-matte-black/10 bg-white p-4">
-              <FiTruck className="text-champagne-gold" aria-hidden="true" />
+            <div className="rounded-2xl border border-matte-black/10 bg-white/90 p-4 shadow-subtle">
+              <Truck className="h-5 w-5 text-champagne-gold" aria-hidden="true" />
               <p className="mt-3 text-sm font-semibold text-matte-black">
                 Delivery Ready
               </p>
@@ -269,8 +269,8 @@ function ProductDetails() {
                 Cash on Delivery checkout will be connected in a future sprint.
               </p>
             </div>
-            <div className="border border-matte-black/10 bg-white p-4">
-              <FiShield className="text-champagne-gold" aria-hidden="true" />
+            <div className="rounded-2xl border border-matte-black/10 bg-white/90 p-4 shadow-subtle">
+              <Shield className="h-5 w-5 text-champagne-gold" aria-hidden="true" />
               <p className="mt-3 text-sm font-semibold text-matte-black">
                 Carefully Packed
               </p>
@@ -281,7 +281,7 @@ function ProductDetails() {
           </div>
 
           <button type="button" onClick={handleWishlist} disabled={mutatingProductId === product.id} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-matte-black transition hover:text-champagne-gold disabled:cursor-not-allowed disabled:opacity-50" aria-pressed={hasItem(product.id)}>
-            <FiHeart fill={hasItem(product.id) ? 'currentColor' : 'none'} aria-hidden="true" />
+            <Heart fill={hasItem(product.id) ? 'currentColor' : 'none'} aria-hidden="true" />
             {hasItem(product.id) ? 'Remove from wishlist' : 'Save to wishlist'}
           </button>
 
@@ -290,18 +290,18 @@ function ProductDetails() {
               type="button"
               variant="primary"
               size="lg"
-              className="w-full rounded-none"
+              className="w-full"
               disabled={product.stock < 1 || isAdding}
               onClick={handleAddToCart}
             >
-              <FiShoppingBag className="mr-2" aria-hidden="true" />
+              <ShoppingBag className="mr-2 h-4 w-4" aria-hidden="true" />
               {isAdding ? 'Adding' : 'Add to Cart'}
             </Button>
             <Button
               type="button"
               variant="secondary"
               size="lg"
-              className="w-full rounded-none"
+              className="w-full"
               disabled={product.stock < 1 || isAdding}
               onClick={handleBuyNow}
             >

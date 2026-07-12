@@ -64,7 +64,7 @@ function Home() {
     <>
       <section className="relative min-h-[calc(100vh-73px)] overflow-hidden bg-matte-black text-ivory-white">
         <img
-          src="https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=1800&q=80"
+          src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1800&q=80"
           alt="Luxury bridal jewellery arranged on ivory fabric"
           className="absolute inset-0 h-full w-full object-cover opacity-42"
         />
@@ -89,12 +89,12 @@ function Home() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link to={ROUTES.SHOP}>
-                <Button variant="secondary" size="lg" className="w-full rounded-none sm:w-auto">
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto">
                   Explore Shop
                 </Button>
               </Link>
               <Link to={ROUTES.ABOUT}>
-                <Button variant="ghost" size="lg" className="w-full rounded-none border-ivory-white/35 text-ivory-white hover:border-champagne-gold sm:w-auto">
+                <Button variant="ghost" size="lg" className="w-full border-ivory-white/25 text-ivory-white hover:border-champagne-gold sm:w-auto">
                   Our Story
                 </Button>
               </Link>
@@ -115,7 +115,7 @@ function Home() {
               <Link
                 key={collection.id}
                 to={`${ROUTES.SHOP}?collection=${collection.slug}`}
-                className="group relative min-h-96 overflow-hidden bg-matte-black"
+                className="group relative min-h-96 overflow-hidden rounded-3xl bg-matte-black shadow-elevated"
               >
                 <img
                   src={collection.image}
@@ -197,9 +197,9 @@ function Home() {
               <Link
                 key={category.id}
                 to={`${ROUTES.SHOP}?category=${category.slug}`}
-                className="group border border-matte-black/10 bg-white p-4 transition duration-300 hover:-translate-y-1 hover:shadow-elevated"
+                className="group overflow-hidden rounded-3xl border border-matte-black/10 bg-white/90 p-4 shadow-subtle transition-all duration-300 hover:-translate-y-1 hover:shadow-glow"
               >
-                <div className="aspect-[4/3] overflow-hidden bg-matte-black/5">
+                <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-matte-black/5">
                   <img
                     src={category.image}
                     alt={category.name}

@@ -1,5 +1,5 @@
 import { forwardRef, useState } from 'react';
-import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { Eye, EyeOff } from 'lucide-react';
 
 const PasswordInput = forwardRef(function PasswordInput(
   { id, label, error, className = '', ...rest },
@@ -19,7 +19,7 @@ const PasswordInput = forwardRef(function PasswordInput(
           type={isVisible ? 'text' : 'password'}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${id}-error` : undefined}
-          className={`w-full rounded-md border bg-ivory-white px-4 py-2.5 pr-11 text-sm text-matte-black placeholder:text-matte-black/40 focus:outline-none focus:ring-2 focus:ring-champagne-gold ${
+          className={`w-full rounded-xl border bg-ivory-white/95 px-4 py-3 pr-11 text-sm text-matte-black placeholder:text-matte-black/35 shadow-sm focus:outline-none focus:ring-4 focus:ring-champagne-gold/12 ${
             error ? 'border-red-400' : 'border-matte-black/20'
           } ${className}`}
           {...rest}
@@ -27,10 +27,10 @@ const PasswordInput = forwardRef(function PasswordInput(
         <button
           type="button"
           onClick={() => setIsVisible((value) => !value)}
-          className="absolute right-3 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center text-matte-black/55 hover:text-champagne-gold"
+          className="absolute right-3 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-matte-black/55 hover:bg-champagne-gold/10 hover:text-champagne-gold"
           aria-label={isVisible ? 'Hide password' : 'Show password'}
         >
-          {isVisible ? <FiEyeOff aria-hidden="true" /> : <FiEye aria-hidden="true" />}
+          {isVisible ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
         </button>
       </div>
       {error && (

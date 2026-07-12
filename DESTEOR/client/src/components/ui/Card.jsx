@@ -9,8 +9,8 @@ function Card({ children, className = '', hoverable = false, ...rest }) {
   return (
     <div
       className={`
-        rounded-card border border-matte-black/10 bg-ivory-white p-6 shadow-subtle
-        ${hoverable ? 'transition-shadow duration-300 hover:shadow-elevated' : ''}
+        rounded-2xl border border-matte-black/10 bg-ivory-white/95 p-6 shadow-subtle
+        ${hoverable ? 'transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated' : ''}
         ${className}
       `}
       {...rest}

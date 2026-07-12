@@ -1,4 +1,4 @@
-import { FiMail, FiMapPin, FiPhone } from 'react-icons/fi';
+import { Mail, MapPin, Phone } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 import PageHero from '@/components/storefront/PageHero';
@@ -26,7 +26,7 @@ function Contact() {
 
       <Container className="grid gap-10 py-12 md:py-16 lg:grid-cols-[1.1fr_0.9fr]">
         <form
-          className="border border-matte-black/10 bg-white p-6 md:p-8"
+          className="rounded-2xl border border-matte-black/10 bg-white/90 p-6 shadow-subtle md:p-8"
           onSubmit={handleSubmit(onSubmit)}
         >
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-champagne-gold">
@@ -66,7 +66,7 @@ function Contact() {
               <textarea
                 id="message"
                 rows="6"
-                className="w-full rounded-md border border-matte-black/20 bg-ivory-white px-4 py-3 text-sm text-matte-black placeholder:text-matte-black/40 focus:outline-none focus:ring-2 focus:ring-champagne-gold"
+                className="w-full rounded-xl border border-matte-black/15 bg-ivory-white/95 px-4 py-3 text-sm text-matte-black placeholder:text-matte-black/35 shadow-sm focus:outline-none focus:ring-4 focus:ring-champagne-gold/12"
                 {...register('message', { required: 'Message is required' })}
               />
               {errors.message && (
@@ -74,7 +74,7 @@ function Contact() {
               )}
             </div>
           </div>
-          <Button type="submit" variant="secondary" className="mt-6 rounded-none">
+          <Button type="submit" variant="secondary" className="mt-6">
             Send Message
           </Button>
           {isSubmitSuccessful && (
@@ -85,26 +85,26 @@ function Contact() {
         </form>
 
         <aside className="space-y-6">
-          <div className="border border-matte-black/10 bg-white p-6">
+          <div className="rounded-2xl border border-matte-black/10 bg-white/90 p-6 shadow-subtle">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-champagne-gold">
               Company Information
             </p>
             <div className="mt-6 space-y-5 text-sm text-matte-black/68">
               <p className="flex gap-3">
-                <FiMapPin className="mt-1 text-champagne-gold" aria-hidden="true" />
+                <MapPin className="mt-1 h-4 w-4 text-champagne-gold" aria-hidden="true" />
                 Lahore, Pakistan
               </p>
               <p className="flex gap-3">
-                <FiMail className="mt-1 text-champagne-gold" aria-hidden="true" />
+                <Mail className="mt-1 h-4 w-4 text-champagne-gold" aria-hidden="true" />
                 hello@desteor.com
               </p>
               <p className="flex gap-3">
-                <FiPhone className="mt-1 text-champagne-gold" aria-hidden="true" />
+                <Phone className="mt-1 h-4 w-4 text-champagne-gold" aria-hidden="true" />
                 +92 300 000 0000
               </p>
             </div>
           </div>
-          <div className="grid min-h-80 place-items-center border border-matte-black/10 bg-matte-black p-6 text-center text-ivory-white">
+          <div className="grid min-h-80 place-items-center rounded-2xl border border-matte-black/10 bg-matte-black p-6 text-center text-ivory-white shadow-glow">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-champagne-gold">
                 Google Maps
