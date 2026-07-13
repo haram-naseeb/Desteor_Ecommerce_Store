@@ -23,6 +23,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 
+const iconButtonClass =
+  'relative grid h-10 w-10 place-items-center rounded-xl border border-ivory-white/10 bg-white/5 text-ivory-white transition hover:-translate-y-0.5 hover:border-champagne-gold/40 hover:text-champagne-gold sm:h-11 sm:w-11';
+
 function Navbar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -32,11 +35,6 @@ function Navbar() {
   const { totalItems: wishlistItems } = useWishlist();
   const [search, setSearch] = useState('');
   const profileMenuRef = useRef(null);
-
-  const linkClass = ({ isActive }) =>
-    `relative text-sm font-semibold uppercase tracking-[0.22em] transition-colors after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:origin-center after:scale-x-0 after:bg-champagne-gold after:transition-transform after:duration-300 hover:text-champagne-gold hover:after:scale-x-100 ${
-      isActive ? 'text-champagne-gold after:scale-x-100' : 'text-ivory-white/86'
-    }`;
 
   const mobileLinkClass = ({ isActive }) =>
     `flex items-center justify-between rounded-xl border border-ivory-white/10 px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] transition-colors ${
@@ -102,20 +100,24 @@ function Navbar() {
     };
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   return (
     <header className="sticky top-0 z-50 border-b border-ivory-white/10 bg-matte-black/90 backdrop-blur-xl supports-[backdrop-filter]:bg-matte-black/80">
-      <nav className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 py-4 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-8">
-        <div className="flex items-center gap-8">
-          <Link to={ROUTES.HOME} className="inline-flex items-center gap-3">
-            <span className="grid h-11 w-11 place-items-center rounded-2xl border border-champagne-gold/50 bg-white/5 font-heading text-xl text-champagne-gold shadow-lg backdrop-blur-sm">
-              D
-            </span>
-            <span className="font-heading text-xl tracking-[0.35em] text-ivory-white">
-              {APP_NAME}
-            </span>
-          </Link>
-
-        </div>
+      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:grid lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:gap-8">
+        <Link to={ROUTES.HOME} className="inline-flex min-w-0 items-center gap-2 sm:gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-champagne-gold/50 bg-white/5 font-heading text-xl text-champagne-gold shadow-lg backdrop-blur-sm sm:h-11 sm:w-11">
+            D
+          </span>
+          <span className="hidden truncate font-heading text-lg tracking-[0.25em] text-ivory-white sm:inline sm:text-xl sm:tracking-[0.35em]">
+            {APP_NAME}
+          </span>
+        </Link>
 
         <form onSubmit={submitSearch} className="hidden w-full max-w-4xl justify-self-center lg:block">
           <label className="sr-only" htmlFor="navbar-search">Search products</label>
@@ -139,28 +141,10 @@ function Navbar() {
           </div>
         </form>
 
-        <div className="flex items-center justify-end gap-2 lg:gap-3">
-          {isAuthenticated ? (
-            <>
-              <Link
-                to={ROUTES.HOME}
-                className="relative grid h-11 w-11 place-items-center rounded-xl border border-ivory-white/10 bg-white/5 text-ivory-white transition hover:-translate-y-0.5 hover:border-champagne-gold/40 hover:text-champagne-gold"
-                aria-label="Home"
-              >
-                <House className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <Link
-                to={ROUTES.SHOP}
-                className="relative grid h-11 w-11 place-items-center rounded-xl border border-ivory-white/10 bg-white/5 text-ivory-white transition hover:-translate-y-0.5 hover:border-champagne-gold/40 hover:text-champagne-gold"
-                aria-label="Shop"
-              >
-                <ShoppingBag className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <Link
-                to={ROUTES.WISHLIST}
-                className="relative grid h-11 w-11 place-items-center rounded-xl border border-ivory-white/10 bg-white/5 text-ivory-white transition hover:-translate-y-0.5 hover:border-champagne-gold/40 hover:text-champagne-gold"
-                aria-label="Wishlist"
-              >
+        <div className="flex shrink-0 items-center justify-end gap-1.5 sm:gap-2 lg:gap-3">
+          {isAuthenticated && (
+            <div className="flex items-center gap-1.5 sm:gap-2 lg:hidden">
+              <Link to={ROUTES.WISHLIST} className={iconButtonClass} aria-label="Wishlist">
                 <Heart className="h-4 w-4" aria-hidden="true" />
                 {wishlistItems > 0 && (
                   <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-champagne-gold px-1.5 text-[0.65rem] font-bold leading-none text-matte-black">
@@ -168,11 +152,34 @@ function Navbar() {
                   </span>
                 )}
               </Link>
-              <Link
-                to={ROUTES.CART}
-                className="relative grid h-11 w-11 place-items-center rounded-xl border border-ivory-white/10 bg-white/5 text-ivory-white transition hover:-translate-y-0.5 hover:border-champagne-gold/40 hover:text-champagne-gold"
-                aria-label="Cart"
-              >
+              <Link to={ROUTES.CART} className={iconButtonClass} aria-label="Cart">
+                <ShoppingCart className="h-4 w-4" aria-hidden="true" />
+                {totalItems > 0 && (
+                  <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-champagne-gold px-1.5 text-[0.65rem] font-bold leading-none text-matte-black">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+            </div>
+          )}
+
+          {isAuthenticated ? (
+            <div className="hidden items-center gap-2 lg:flex">
+              <Link to={ROUTES.HOME} className={iconButtonClass} aria-label="Home">
+                <House className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link to={ROUTES.SHOP} className={iconButtonClass} aria-label="Shop">
+                <ShoppingBag className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link to={ROUTES.WISHLIST} className={iconButtonClass} aria-label="Wishlist">
+                <Heart className="h-4 w-4" aria-hidden="true" />
+                {wishlistItems > 0 && (
+                  <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-champagne-gold px-1.5 text-[0.65rem] font-bold leading-none text-matte-black">
+                    {wishlistItems}
+                  </span>
+                )}
+              </Link>
+              <Link to={ROUTES.CART} className={iconButtonClass} aria-label="Cart">
                 <ShoppingCart className="h-4 w-4" aria-hidden="true" />
                 {totalItems > 0 && (
                   <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-champagne-gold px-1.5 text-[0.65rem] font-bold leading-none text-matte-black">
@@ -249,21 +256,13 @@ function Navbar() {
                   )}
                 </AnimatePresence>
               </div>
-            </>
+            </div>
           ) : (
             <div className="hidden items-center gap-2 lg:flex">
-              <Link
-                to={ROUTES.HOME}
-                className="relative grid h-11 w-11 place-items-center rounded-xl border border-ivory-white/10 bg-white/5 text-ivory-white transition hover:-translate-y-0.5 hover:border-champagne-gold/40 hover:text-champagne-gold"
-                aria-label="Home"
-              >
+              <Link to={ROUTES.HOME} className={iconButtonClass} aria-label="Home">
                 <House className="h-4 w-4" aria-hidden="true" />
               </Link>
-              <Link
-                to={ROUTES.SHOP}
-                className="relative grid h-11 w-11 place-items-center rounded-xl border border-ivory-white/10 bg-white/5 text-ivory-white transition hover:-translate-y-0.5 hover:border-champagne-gold/40 hover:text-champagne-gold"
-                aria-label="Shop"
-              >
+              <Link to={ROUTES.SHOP} className={iconButtonClass} aria-label="Shop">
                 <ShoppingBag className="h-4 w-4" aria-hidden="true" />
               </Link>
               <div ref={profileMenuRef} className="relative">
@@ -325,7 +324,7 @@ function Navbar() {
 
           <button
             type="button"
-            className="grid h-11 w-11 place-items-center rounded-xl border border-ivory-white/10 bg-white/5 text-ivory-white transition hover:-translate-y-0.5 hover:border-champagne-gold/40 hover:text-champagne-gold lg:hidden"
+            className={`${iconButtonClass} lg:hidden`}
             aria-label={isOpen ? 'Close navigation' : 'Open navigation'}
             aria-expanded={isOpen}
             onClick={() => setIsOpen((value) => !value)}
@@ -335,71 +334,90 @@ function Navbar() {
         </div>
       </nav>
 
-      {isOpen && (
-        <div className="border-t border-ivory-white/10 bg-matte-black/98 px-6 py-5 lg:hidden">
-          <div className="flex flex-col gap-4">
-            <form onSubmit={submitSearch} className="relative">
-              <label className="sr-only" htmlFor="mobile-navbar-search">
-                Search products
-              </label>
-              <input
-                id="mobile-navbar-search"
-                autoComplete="off"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search jewelry, collections, or styles"
-                className="header-search w-full rounded-full border border-ivory-white/10 !bg-transparent py-3.5 pl-5 pr-16 text-sm text-ivory-white placeholder:text-ivory-white/45 shadow-[0_12px_30px_rgba(13,13,13,0.18)] outline-none transition-all duration-300 focus:border-champagne-gold focus:!bg-transparent focus:ring-4 focus:ring-champagne-gold/10"
-                style={{ color: '#fff', WebkitTextFillColor: '#fff' }}
-              />
-              <button
-                type="submit"
-                className="absolute inset-y-1.5 right-1.5 grid w-11 place-items-center rounded-full bg-champagne-gold/14 text-champagne-gold shadow-sm ring-1 ring-champagne-gold/10 transition-colors hover:bg-champagne-gold/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne-gold"
-                aria-label="Search products"
-              >
-                <Search className="h-4 w-4" aria-hidden="true" />
-              </button>
-            </form>
-            <div className="grid grid-cols-2 gap-3">
-              <Link to={ROUTES.HOME} className={mobileLinkClass} onClick={closeMenu} aria-label="Home">
-                <span>Home</span>
-                <House className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
-              </Link>
-              <Link to={ROUTES.SHOP} className={mobileLinkClass} onClick={closeMenu} aria-label="Shop">
-                <span>Shop</span>
-                <ShoppingBag className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
-              </Link>
-            </div>
-            {authLinks.map((item) => (
-              <NavLink key={item.label} to={item.to} className={mobileLinkClass} onClick={closeMenu}>
-                {item.label}
-              </NavLink>
-            ))}
-            {isAuthenticated && (
-              <>
-                <NavLink to={ROUTES.WISHLIST} className={mobileLinkClass} onClick={closeMenu}>
-                  Wishlist
-                  <span className="rounded-full bg-champagne-gold px-2 py-1 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-matte-black">
-                    {wishlistItems}
-                  </span>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden border-t border-ivory-white/10 bg-matte-black/98 lg:hidden"
+          >
+            <div className="flex flex-col gap-4 px-4 py-5 sm:px-6">
+              <form onSubmit={submitSearch} className="relative">
+                <label className="sr-only" htmlFor="mobile-navbar-search">
+                  Search products
+                </label>
+                <input
+                  id="mobile-navbar-search"
+                  autoComplete="off"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search jewelry, collections, or styles"
+                  className="header-search w-full rounded-full border border-ivory-white/10 !bg-transparent py-3.5 pl-5 pr-16 text-sm text-ivory-white placeholder:text-ivory-white/45 shadow-[0_12px_30px_rgba(13,13,13,0.18)] outline-none transition-all duration-300 focus:border-champagne-gold focus:!bg-transparent focus:ring-4 focus:ring-champagne-gold/10"
+                  style={{ color: '#fff', WebkitTextFillColor: '#fff' }}
+                />
+                <button
+                  type="submit"
+                  className="absolute inset-y-1.5 right-1.5 grid w-11 place-items-center rounded-full bg-champagne-gold/14 text-champagne-gold shadow-sm ring-1 ring-champagne-gold/10 transition-colors hover:bg-champagne-gold/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne-gold"
+                  aria-label="Search products"
+                >
+                  <Search className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </form>
+
+              {isAuthenticated && (
+                <div className="rounded-xl border border-ivory-white/10 bg-white/5 px-4 py-3">
+                  <p className="text-xs uppercase tracking-[0.24em] text-champagne-gold">Account</p>
+                  <p className="mt-1 text-sm text-ivory-white/70">
+                    {currentUser?.firstName || 'Your profile'}
+                  </p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-3">
+                <NavLink to={ROUTES.HOME} className={mobileLinkClass} onClick={closeMenu}>
+                  <span>Home</span>
+                  <House className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
                 </NavLink>
-                <NavLink to={ROUTES.CART} className={mobileLinkClass} onClick={closeMenu}>
-                  Cart
-                  <span className="rounded-full bg-champagne-gold px-2 py-1 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-matte-black">
-                    {totalItems}
-                  </span>
+                <NavLink to={ROUTES.SHOP} className={mobileLinkClass} onClick={closeMenu}>
+                  <span>Shop</span>
+                  <ShoppingBag className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
                 </NavLink>
+              </div>
+
+              {isAuthenticated &&
+                profileItems.map((item) => {
+                  const Icon = item.icon;
+
+                  return (
+                    <NavLink key={item.label} to={item.to} className={mobileLinkClass} onClick={closeMenu}>
+                      <span>{item.label}</span>
+                      <Icon className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
+                    </NavLink>
+                  );
+                })}
+
+              {authLinks.map((item) => (
+                <NavLink key={item.label} to={item.to} className={mobileLinkClass} onClick={closeMenu}>
+                  {item.label}
+                </NavLink>
+              ))}
+
+              {isAuthenticated && (
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="rounded-xl border border-ivory-white/10 px-4 py-3 text-left text-sm font-medium uppercase tracking-[0.2em] text-ivory-white/82 transition hover:bg-ivory-white/5 hover:text-champagne-gold"
+                  className="flex items-center justify-between rounded-xl border border-ivory-white/10 px-4 py-3 text-left text-sm font-semibold uppercase tracking-[0.2em] text-ivory-white/82 transition hover:bg-ivory-white/5 hover:text-champagne-gold"
                 >
-                  Logout
+                  <span>Logout</span>
+                  <LogOut className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
                 </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
