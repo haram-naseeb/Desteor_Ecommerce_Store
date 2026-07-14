@@ -38,7 +38,7 @@ function CartItemRow({ item, disabled, onQuantityChange, onRemove }) {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-champagne-gold">
-              {item.product.collectionName || item.product.categoryName}
+              {item.product.categoryName}
             </p>
             <Link
               to={`/shop/${item.product.slug}`}

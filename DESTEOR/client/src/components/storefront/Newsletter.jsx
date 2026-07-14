@@ -13,8 +13,7 @@ function Newsletter() {
           </p>
           <h2 className="mt-3 text-3xl md:text-4xl">Join the DESTEOR circle</h2>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-ivory-white/68">
-            Receive collection previews, styling notes, and bridal appointment
-            announcements before they are public.
+            Receive new arrivals, styling notes, and early access announcements before they are public.
           </p>
         </div>
         <form className="flex flex-col gap-3 sm:flex-row" onSubmit={(event) => event.preventDefault()}>

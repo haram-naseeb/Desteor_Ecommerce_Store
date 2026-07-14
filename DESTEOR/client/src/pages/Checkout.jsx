@@ -125,7 +125,7 @@ function Checkout() {
                 </div>
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-champagne-gold">
-                    {item.product.collectionName || item.product.categoryName}
+                    {item.product.categoryName}
                   </p>
                   <h2 className="mt-2 font-heading text-xl text-matte-black">
                     {item.product.name}

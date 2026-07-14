@@ -1,14 +1,14 @@
 # DESTEOR
 
-**Crafted for Your Destiny.**
+**Discover Fine Jewellery.**
 
-DESTEOR is a premium, AI-powered bridal jewellery e-commerce platform. This is a production-oriented business platform — not a demo project — built with a headless architecture separating a React frontend from a Node.js/Express backend.
+DESTEOR is a premium, AI-powered luxury jewellery e-commerce platform. This is a production-oriented business platform — not a demo project — built with a headless architecture separating a React frontend from a Node.js/Express backend.
 
 ---
 
 ## Brand
 
-- **Industry:** Premium Artificial Bridal Jewellery
+- **Industry:** Luxury Jewellery
 - **Theme:** Luxury, Minimal, Elegant, Timeless
 - **Colors:** Matte Black · Champagne Gold · Ivory White
 - **Typography:** Cinzel (headings) · Poppins (body)

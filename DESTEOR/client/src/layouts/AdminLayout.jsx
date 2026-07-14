@@ -3,7 +3,6 @@ import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard,
-  Layers3,
   LogOut,
   Menu,
   Package,
@@ -32,7 +31,6 @@ const ADMIN_NAV_ITEMS = [
   { label: 'Orders', path: ROUTES.ADMIN.ORDERS, icon: Package },
   { label: 'Users', path: ROUTES.ADMIN.USERS, icon: Users },
   { label: 'Categories', path: ROUTES.ADMIN.CATEGORIES, icon: Shapes },
-  { label: 'Collections', path: ROUTES.ADMIN.COLLECTIONS, icon: Layers3 },
 ];
 
 function AdminSidebar({ onNavigate }) {

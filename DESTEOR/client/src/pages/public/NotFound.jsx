@@ -12,7 +12,7 @@ function NotFound() {
           404
         </p>
         <h1 className="mx-auto mt-5 max-w-3xl text-4xl leading-tight md:text-6xl">
-          This page slipped out of the collection
+          This page could not be found
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-ivory-white/68 md:text-base">
           The route may be outdated, but the storefront is still ready for a

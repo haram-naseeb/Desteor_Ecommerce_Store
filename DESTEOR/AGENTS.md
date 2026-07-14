@@ -24,11 +24,11 @@ Brand name: DESTEOR
 
 
 
-Tagline: Crafted for Your Destiny
+Tagline: Discover Fine Jewellery
 
 
 
-Industry: Premium Artificial Bridal Jewellery
+Industry: Luxury Jewellery
 
 
 

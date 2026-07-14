@@ -12,7 +12,6 @@ import Section from '@/components/ui/Section';
 import { APP_TAGLINE } from '@/constants/app';
 import { ROUTES } from '@/constants/routes';
 import { getCategories } from '@/services/category.service';
-import { getCollections } from '@/services/collection.service';
 import {
   getBestSellerProducts,
   getFeaturedProducts,
@@ -20,7 +19,7 @@ import {
 
 function Home() {
   const [categories, setCategories] = useState([]);
-  const [collections, setCollections] = useState([]);
+  
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,17 +30,14 @@ function Home() {
 
     async function loadStorefront() {
       try {
-        const [categoryData, collectionData, featuredData, bestSellerData] =
-          await Promise.all([
-            getCategories(),
-            getCollections(),
-            getFeaturedProducts(4),
-            getBestSellerProducts(4),
-          ]);
+        const [categoryData, featuredData, bestSellerData] = await Promise.all([
+          getCategories(),
+          getFeaturedProducts(4),
+          getBestSellerProducts(4),
+        ]);
 
         if (!isMounted) return;
         setCategories(categoryData);
-        setCollections(collectionData);
         setFeaturedProducts(featuredData);
         setBestSellers(bestSellerData);
       } catch (requestError) {
@@ -65,7 +61,7 @@ function Home() {
       <section className="relative min-h-[calc(100vh-73px)] overflow-hidden bg-matte-black text-ivory-white">
         <img
           src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1800&q=80"
-          alt="Luxury bridal jewellery arranged on ivory fabric"
+          alt="Luxury jewellery arranged on ivory fabric"
           className="absolute inset-0 h-full w-full object-cover opacity-42"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-matte-black via-matte-black/78 to-matte-black/20" />
@@ -77,15 +73,14 @@ function Home() {
             className="max-w-3xl"
           >
             <p className="text-xs font-semibold uppercase tracking-[0.35em] text-champagne-gold">
-              Premium Artificial Bridal Jewellery
+              Premium Luxury Jewellery
             </p>
             <h1 className="mt-5 text-5xl leading-tight md:text-7xl">DESTEOR</h1>
             <p className="mt-5 text-xl font-light text-ivory-white/86 md:text-2xl">
               {APP_TAGLINE}
             </p>
             <p className="mt-6 max-w-xl text-sm leading-8 text-ivory-white/70 md:text-base">
-              Sculpted for brides who want heirloom presence, modern restraint,
-              and a finish that feels intentional from every angle.
+              Sculpted for modern elegance with a focus on proportion, finish, and enduring wear.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link to={ROUTES.SHOP}>
@@ -103,41 +98,7 @@ function Home() {
         </Container>
       </section>
 
-      <Section tone="light">
-        <Container>
-          <SectionHeading
-            eyebrow="Collections"
-            title="Designed around the ceremony"
-            description="Each edit is built for a different bridal mood, from luminous pearls to warm heritage gold."
-          />
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {collections.map((collection) => (
-              <Link
-                key={collection.id}
-                to={`${ROUTES.SHOP}?collection=${collection.slug}`}
-                className="group relative min-h-96 overflow-hidden rounded-3xl bg-matte-black shadow-elevated"
-              >
-                <img
-                  src={collection.image}
-                  alt={collection.name}
-                  className="absolute inset-0 h-full w-full object-cover opacity-70 transition duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-matte-black via-matte-black/40 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-6 text-ivory-white">
-                  <p className="text-xs uppercase tracking-[0.25em] text-champagne-gold">
-                    {collection.slug}
-                  </p>
-                  <h3 className="mt-2 text-2xl">{collection.name}</h3>
-                  <p className="mt-3 text-sm leading-6 text-ivory-white/72">
-                    {collection.description}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </Container>
-      </Section>
+      {/* Collections removed from homepage */}
 
       <Section className="bg-white">
         <Container>

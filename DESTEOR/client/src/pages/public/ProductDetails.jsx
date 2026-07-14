@@ -193,7 +193,7 @@ function ProductDetails() {
       <Container className="py-20 text-center">
         <h1 className="text-4xl text-matte-black">Piece not found</h1>
         <p className="mt-4 text-matte-black/60">
-          {error || 'This design may have moved or left the collection.'}
+          {error || 'This design may have moved or is unavailable.'}
         </p>
         <Link to={ROUTES.SHOP} className="mt-8 inline-block">
           <Button variant="secondary">
@@ -222,9 +222,6 @@ function ProductDetails() {
         <ProductGallery product={product} />
 
         <section>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-champagne-gold">
-            {product.collectionName}
-          </p>
           <h1 className="mt-4 text-4xl leading-tight text-matte-black md:text-5xl">
             {product.name}
           </h1>

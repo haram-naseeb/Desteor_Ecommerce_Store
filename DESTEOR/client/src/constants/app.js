@@ -7,4 +7,4 @@
  */
 
 export const APP_NAME = 'DESTEOR';
-export const APP_TAGLINE = 'Crafted for Your Destiny.';
+export const APP_TAGLINE = 'Discover Fine Jewellery.';

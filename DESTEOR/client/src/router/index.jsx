@@ -42,7 +42,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Shop />,
+        element: <Home />,
       },
       {
         path: 'shop',
@@ -130,7 +130,6 @@ const router = createBrowserRouter([
       { path: 'orders', element: <AdminOrders /> },
       { path: 'users', element: <AdminUsers /> },
       { path: 'categories', element: <TaxonomyPage type="categories" title="Categories" /> },
-      { path: 'collections', element: <TaxonomyPage type="collections" title="Collections" /> },
     ] }],
   },
 ]);
