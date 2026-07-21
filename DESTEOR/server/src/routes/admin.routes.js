@@ -22,4 +22,6 @@ router.route('/collections/:id').put(validateTaxonomy, controller.updateCollecti
 router.route('/orders').get(controller.orders);
 router.get('/orders/:id', controller.order);
 router.patch('/orders/:id/status', validateStatus, controller.updateOrderStatus);
+router.get('/reviews', controller.reviews);
+router.delete('/reviews/:id', controller.deleteReview);
 module.exports = router;

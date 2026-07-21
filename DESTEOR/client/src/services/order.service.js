@@ -11,8 +11,8 @@ function normalizeOrder(order) {
   };
 }
 
-export async function checkout() {
-  const response = await api.post('/orders/checkout');
+export async function checkout(payload) {
+  const response = await api.post('/orders/checkout', payload);
   return normalizeOrder(response.data.data.order);
 }
 

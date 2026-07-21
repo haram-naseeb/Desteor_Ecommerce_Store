@@ -2,7 +2,7 @@ const orderService = require('../services/order.service');
 
 async function checkout(req, res, next) {
   try {
-    const order = await orderService.checkout(req.user.id);
+    const order = await orderService.checkout(req.user?.id, req.body);
 
     res.status(201).json({
       success: true,

@@ -1,15 +1,32 @@
 const adminRepository = require('../repositories/admin.repository');
 
-const ORDER_STATUSES = ['PENDING', 'PROCESSING', 'PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
-const NEXT_STATUS = { PENDING: ['PROCESSING', 'CANCELLED'], PROCESSING: ['PACKED', 'CANCELLED'], PACKED: ['SHIPPED', 'CANCELLED'], SHIPPED: ['DELIVERED', 'CANCELLED'], DELIVERED: [], CANCELLED: [] };
+const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+const NEXT_STATUS = { PENDING: ['CONFIRMED', 'CANCELLED'], CONFIRMED: ['PREPARING', 'CANCELLED'], PREPARING: ['SHIPPED', 'DELIVERED', 'CANCELLED'], SHIPPED: ['DELIVERED', 'CANCELLED'], DELIVERED: [], CANCELLED: [] };
 
 function createError(message, statusCode = 400) { const error = new Error(message); error.statusCode = statusCode; return error; }
+function normalizeSlug(value) {
+  return value
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
 function pagination(query) { const page = Math.max(1, Number.parseInt(query.page, 10) || 1); const limit = Math.min(50, Math.max(1, Number.parseInt(query.limit, 10) || 12)); return { page, limit, skip: (page - 1) * limit }; }
 function meta(total, page, limit) { const totalPages = Math.max(1, Math.ceil(total / limit)); return { total, page, limit, totalPages, hasNextPage: page < totalPages, hasPreviousPage: page > 1 }; }
 function mapProduct(product) { return product; }
 function productData(input) {
-  const { images = [], specifications = [], categoryId, collectionId, ...fields } = input;
-  return { ...fields, category: { connect: { id: categoryId } }, collection: { connect: { id: collectionId } }, images: { create: images.map((image, index) => ({ url: image.url, cloudinaryPublicId: image.publicId || image.cloudinaryPublicId || null, altText: image.altText || null, displayOrder: image.displayOrder ?? index })) }, specifications: { create: specifications.map((specification, index) => ({ label: specification.label, value: specification.value, displayOrder: specification.displayOrder ?? index })) } };
+  const { images = [], specifications = [], categoryId, collectionId, slug, ...fields } = input;
+  return {
+    ...fields,
+    slug: slug ? normalizeSlug(slug) : '',
+    category: { connect: { id: categoryId } },
+    collection: { connect: { id: collectionId } },
+    images: { create: images.map((image, index) => ({ url: image.url, cloudinaryPublicId: image.publicId || image.cloudinaryPublicId || null, altText: image.altText || null, displayOrder: image.displayOrder ?? index })) },
+    specifications: { create: specifications.map((specification, index) => ({ label: specification.label, value: specification.value, displayOrder: specification.displayOrder ?? index })) },
+  };
 }
 function productUpdateData(input) {
   const { images, specifications, categoryId, collectionId, ...fields } = input;
@@ -26,7 +43,7 @@ async function getProducts(query) { const { page, limit, skip } = pagination(que
 async function getProduct(id) { const product = await adminRepository.findProduct(id); if (!product) throw createError('Product not found.', 404); return product; }
 async function createProduct(input) { return adminRepository.createProduct(productData(input)); }
 async function deleteCloudinaryImages(images) { const { deleteImage } = require('./media.service'); await Promise.all(images.filter((image) => image.cloudinaryPublicId).map((image) => deleteImage(image.cloudinaryPublicId))); }
-async function updateProduct(id, input) { const existing = await getProduct(id); if (input.images) { const retainedPublicIds = new Set(input.images.map((image) => image.cloudinaryPublicId)); await deleteCloudinaryImages(existing.images.filter((image) => !retainedPublicIds.has(image.cloudinaryPublicId))); } return adminRepository.updateProduct(id, productUpdateData(input)); }
+async function updateProduct(id, input) { const existing = await getProduct(id); if (input.images) { const retainedPublicIds = new Set(input.images.map((image) => image.cloudinaryPublicId)); await deleteCloudinaryImages(existing.images.filter((image) => !retainedPublicIds.has(image.cloudinaryPublicId))); } if (input.slug) { input.slug = normalizeSlug(input.slug); } return adminRepository.updateProduct(id, productUpdateData(input)); }
 async function removeProduct(id) { const product = await getProduct(id); const [cartItems, orderItems] = await adminRepository.getProductReferenceCounts(id); if (cartItems || orderItems) throw createError('This product cannot be deleted because it is referenced by cart or order records.', 409); await deleteCloudinaryImages(product.images); await adminRepository.deleteProduct(id); }
 async function getTaxonomies(type) { return adminRepository.findTaxonomies(type); }
 async function createTaxonomy(type, data) { return adminRepository.createTaxonomy(type, data); }

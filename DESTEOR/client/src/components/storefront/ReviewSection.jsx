@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Edit2, Star, Trash2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import Button from '@/components/ui/Button';
 import EmptyState from '@/components/ui/EmptyState';
@@ -31,7 +31,8 @@ function Stars({ rating, interactive = false, onChange }) {
   );
 }
 
-function ReviewSection({ productId }) {
+function ReviewSection({ productId, initialOrderId, onSummary }) {
+  const location = useLocation();
   const { currentUser, isAuthenticated } = useAuth();
   const { showToast } = useToast();
   const [data, setData] = useState({ reviews: [], averageRating: 0, reviewCount: 0 });
@@ -39,17 +40,22 @@ function ReviewSection({ productId }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [editingId, setEditingId] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const orderId = initialOrderId || location.state?.orderId || '';
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setData(await getReviews(productId));
+      const next = await getReviews(productId);
+      setData(next);
+      if (typeof onSummary === 'function') {
+        onSummary(next);
+      }
     } catch (error) {
       showToast(error.message || 'Unable to load reviews.', 'error');
     } finally {
       setLoading(false);
     }
-  }, [productId, showToast]);
+  }, [onSummary, productId, showToast]);
 
   useEffect(() => {
     load();
@@ -57,9 +63,14 @@ function ReviewSection({ productId }) {
 
   const submit = async (event) => {
     event.preventDefault();
+    if (!editingId && !orderId) {
+      showToast('Select a delivered order before submitting a review.', 'error');
+      return;
+    }
     setSubmitting(true);
     try {
-      const next = editingId ? await updateReview(editingId, form) : await createReview(productId, form);
+      const payload = editingId ? form : { ...form, orderId };
+      const next = editingId ? await updateReview(editingId, payload) : await createReview(productId, payload);
       setData(next);
       setForm(EMPTY_FORM);
       setEditingId('');
@@ -103,53 +114,68 @@ function ReviewSection({ productId }) {
       </div>
 
       {isAuthenticated ? (
-        <form onSubmit={submit} className="mt-8 grid gap-4 rounded-2xl border border-matte-black/10 bg-white/90 p-6 shadow-subtle">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="font-semibold text-matte-black">{editingId ? 'Edit your review' : 'Share your experience'}</p>
-            <Stars rating={form.rating} interactive onChange={(rating) => setForm((value) => ({ ...value, rating }))} />
-          </div>
-          <Input
-            required
-            maxLength="120"
-            value={form.title}
-            onChange={(event) => setForm((value) => ({ ...value, title: event.target.value }))}
-            placeholder="Review title"
-          />
-          <textarea
-            required
-            minLength="10"
-            maxLength="2000"
-            value={form.comment}
-            onChange={(event) => setForm((value) => ({ ...value, comment: event.target.value }))}
-            placeholder="Tell us what you loved"
-            rows="4"
-            className="rounded-xl border border-matte-black/15 bg-ivory-white/95 px-4 py-3 text-sm shadow-sm focus:ring-4 focus:ring-champagne-gold/12"
-          />
-          <div className="flex gap-3">
-            <Button type="submit" variant="secondary" disabled={submitting}>
-              {submitting ? 'Saving...' : editingId ? 'Update review' : 'Submit review'}
-            </Button>
-            {editingId && (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => {
-                  setEditingId('');
-                  setForm(EMPTY_FORM);
-                }}
-              >
-                Cancel
+        orderId || editingId ? (
+          <form onSubmit={submit} className="mt-8 grid gap-4 rounded-2xl border border-matte-black/10 bg-white/90 p-6 shadow-subtle">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="font-semibold text-matte-black">{editingId ? 'Edit your review' : 'Share your experience'}</p>
+              <Stars rating={form.rating} interactive onChange={(rating) => setForm((value) => ({ ...value, rating }))} />
+            </div>
+            <Input
+              required
+              maxLength="120"
+              value={form.title}
+              onChange={(event) => setForm((value) => ({ ...value, title: event.target.value }))}
+              placeholder="Review title"
+            />
+            <textarea
+              required
+              minLength="10"
+              maxLength="2000"
+              value={form.comment}
+              onChange={(event) => setForm((value) => ({ ...value, comment: event.target.value }))}
+              placeholder="Tell us what you loved"
+              rows="4"
+              className="rounded-xl border border-matte-black/15 bg-ivory-white/95 px-4 py-3 text-sm shadow-sm focus:ring-4 focus:ring-champagne-gold/12"
+            />
+            <div className="flex gap-3">
+              <Button type="submit" variant="secondary" disabled={submitting}>
+                {submitting ? 'Saving...' : editingId ? 'Update review' : 'Submit review'}
               </Button>
-            )}
+              {editingId && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setEditingId('');
+                    setForm(EMPTY_FORM);
+                  }}
+                >
+                  Cancel
+                </Button>
+              )}
+            </div>
+          </form>
+        ) : (
+          <div className="mt-8 rounded-2xl border border-matte-black/10 bg-white/90 p-5 text-sm text-matte-black/65 shadow-subtle">
+            Reviews are available only after an item is delivered. Navigate to your delivered order and leave feedback from there.
           </div>
-        </form>
+        )
       ) : (
         <div className="mt-8 rounded-2xl border border-matte-black/10 bg-white/90 p-5 text-sm text-matte-black/65 shadow-subtle">
-          Please{' '}
-          <Link className="font-semibold text-champagne-gold" to={ROUTES.LOGIN}>
-            sign in
-          </Link>{' '}
-          to leave a review.
+          {orderId ? (
+            <>
+              You must be signed in to leave a review.
+              {' '}
+              <Link className="font-semibold text-champagne-gold" to={ROUTES.LOGIN}>
+                Sign in
+              </Link>
+              {' '}to share your feedback.
+            </>
+          ) : (
+            <>
+              Reviews are available only after an item is delivered. Navigate to your delivered order and leave feedback from there.
+            </>
+          )}
         </div>
       )}
 

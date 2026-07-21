@@ -49,7 +49,14 @@ function requireRole(...allowedRoles) {
   };
 }
 
+async function optionalProtect(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) return next();
+  return protect(req, res, next);
+}
+
 module.exports = {
   protect,
+  optionalProtect,
   requireRole,
 };

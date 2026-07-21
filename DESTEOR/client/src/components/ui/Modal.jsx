@@ -61,7 +61,7 @@ function Modal({ isOpen, onClose, title, children }) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-matte-black/60 px-4"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-matte-black px-4 py-6 sm:items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -74,7 +74,7 @@ function Modal({ isOpen, onClose, title, children }) {
             aria-modal="true"
             aria-label={title}
             tabIndex={-1}
-            className="w-full max-w-lg rounded-2xl border border-matte-black/10 bg-ivory-white/98 p-6 shadow-glow backdrop-blur-sm focus:outline-none"
+            className="w-full max-w-[min(100vw-2rem,44rem)] max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl border border-matte-black/10 bg-ivory-white p-6 shadow-glow focus:outline-none"
             initial={{ opacity: 0, y: 16, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}

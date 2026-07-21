@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
-import { FiArrowLeft, FiCheckCircle } from 'react-icons/fi';
+import { FiArrowLeft, FiCheckCircle, FiCreditCard, FiTruck } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
 
 import Breadcrumbs from '@/components/storefront/Breadcrumbs';
 import Button from '@/components/ui/Button';
 import Container from '@/components/ui/Container';
 import Loader from '@/components/ui/Loader';
+import Input from '@/components/ui/Input';
 import { ROUTES } from '@/constants/routes';
 import { useCart } from '@/hooks/useCart';
 import { checkout as checkoutOrder } from '@/services/order.service';
@@ -32,6 +33,7 @@ function Checkout() {
   const { cart, loading, refreshCart } = useCart();
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState('');
+  const [form, setForm] = useState({ customerName: '', phone: '', address: '', city: '', postalCode: '', notes: '', paymentMethod: 'COD' });
   const hasItems = cart.items.length > 0;
   const summary = useMemo(() => {
     const subtotal = cart.summary.subtotal;
@@ -50,7 +52,7 @@ function Checkout() {
     setError('');
 
     try {
-      const order = await checkoutOrder();
+      const order = await checkoutOrder(form);
       await refreshCart();
       navigate(`${ROUTES.ORDERS}/${order.id}`, { replace: true });
     } catch (requestError) {
@@ -104,7 +106,22 @@ function Checkout() {
         </div>
       ) : (
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
-          <section className="space-y-4">
+          <section className="space-y-6">
+            <div className="rounded-3xl border border-matte-black/10 bg-white p-6 shadow-subtle">
+              <p className="text-xs font-semibold uppercase tracking-[.25em] text-champagne-gold">Customer information</p>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                {[['customerName', 'Full Name *'], ['phone', 'Phone Number *'], ['city', 'City *'], ['postalCode', 'Postal Code (optional)']].map(([key, label]) => <Input key={key} required={key !== 'postalCode'} value={form[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value })} placeholder={label} />)}
+                <textarea required value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Complete Address *" rows="3" className="sm:col-span-2 rounded-xl border border-matte-black/15 bg-ivory-white px-4 py-3 text-sm" />
+                <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Additional notes (optional)" rows="2" className="sm:col-span-2 rounded-xl border border-matte-black/15 bg-ivory-white px-4 py-3 text-sm" />
+              </div>
+            </div>
+            <div className="rounded-3xl border border-matte-black/10 bg-white p-6 shadow-subtle">
+              <p className="text-xs font-semibold uppercase tracking-[.25em] text-champagne-gold">Payment method</p>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                {[['COD', FiTruck, 'Cash on Delivery', 'Pay when your order arrives.'], ['ONLINE', FiCreditCard, 'Online Payment', 'Transfer payment before shipment.']].map(([value, Icon, title, description]) => <button key={value} type="button" onClick={() => setForm({ ...form, paymentMethod: value })} className={`rounded-3xl border p-5 text-left transition ${form.paymentMethod === value ? 'border-champagne-gold bg-champagne-gold/10' : 'border-matte-black/10'}`}><Icon className="text-champagne-gold" /><p className="mt-3 font-semibold">{title}</p><p className="mt-1 text-sm text-matte-black/60">{description}</p></button>)}
+              </div>
+              {form.paymentMethod === 'ONLINE' && <div className="mt-4 rounded-2xl border border-champagne-gold/40 bg-champagne-gold/10 p-4 text-sm leading-6 text-matte-black/75"><strong>Online Payment Instructions</strong><br />JazzCash / Easypaisa: <strong>03094178401</strong><br />After placing your order, send the payment screenshot on WhatsApp. Your order is confirmed once payment is verified.</div>}
+            </div>
             {cart.items.map((item) => (
               <article
                 key={item.id}

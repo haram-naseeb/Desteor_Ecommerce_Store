@@ -20,7 +20,7 @@ function toPositiveInteger(value, fallback, max = Number.MAX_SAFE_INTEGER) {
   return Math.min(parsed, max);
 }
 
-function mapProduct(product) {
+function mapProduct(product, summary = {}) {
   return {
     id: product.id,
     name: product.name,
@@ -37,7 +37,28 @@ function mapProduct(product) {
     specifications: product.specifications,
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
+    averageRating: summary.averageRating ?? 0,
+    reviewCount: summary.reviewCount ?? 0,
   };
+}
+
+function addReviewSummaries(products) {
+  if (!products.length) {
+    return products.map((product) => mapProduct(product));
+  }
+
+  return catalogRepository.findReviewSummaries(products.map((product) => product.id))
+    .then((summaries) => {
+      const summaryByProduct = summaries.reduce((acc, summary) => {
+        acc[summary.productId] = {
+          averageRating: summary._avg.rating || 0,
+          reviewCount: summary._count._all,
+        };
+        return acc;
+      }, {});
+
+      return products.map((product) => mapProduct(product, summaryByProduct[product.id]));
+    });
 }
 
 function mapTaxonomy(record) {
@@ -131,7 +152,7 @@ async function getProducts(query = {}) {
   });
 
   return {
-    products: products.map(mapProduct),
+    products: await addReviewSummaries(products),
     meta: createMeta({ total, page, limit }),
   };
 }
@@ -151,9 +172,12 @@ async function getProductBySlug(slug) {
     limit: 3,
   });
 
+  const allProducts = [product, ...relatedProducts];
+  const normalizedProducts = await addReviewSummaries(allProducts);
+
   return {
-    product: mapProduct(product),
-    relatedProducts: relatedProducts.map(mapProduct),
+    product: normalizedProducts[0],
+    relatedProducts: normalizedProducts.slice(1),
   };
 }
 
@@ -161,14 +185,14 @@ async function getFeaturedProducts(limitValue) {
   const limit = toPositiveInteger(limitValue, 8, MAX_LIMIT);
   const products = await catalogRepository.findFeaturedProducts(limit);
 
-  return products.map(mapProduct);
+  return await addReviewSummaries(products);
 }
 
 async function getBestSellerProducts(limitValue) {
   const limit = toPositiveInteger(limitValue, 8, MAX_LIMIT);
   const products = await catalogRepository.findBestSellerProducts(limit);
 
-  return products.map(mapProduct);
+  return await addReviewSummaries(products);
 }
 
 async function getCategories() {

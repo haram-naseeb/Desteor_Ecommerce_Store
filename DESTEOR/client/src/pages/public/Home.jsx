@@ -16,6 +16,7 @@ import {
   getBestSellerProducts,
   getFeaturedProducts,
 } from '@/services/product.service';
+import mainImage from '@/assets/main.jpg';
 
 function Home() {
   const [categories, setCategories] = useState([]);
@@ -60,17 +61,17 @@ function Home() {
     <>
       <section className="relative min-h-[calc(100vh-73px)] overflow-hidden bg-matte-black text-ivory-white">
         <img
-          src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1800&q=80"
+          src={mainImage}
           alt="Luxury jewellery arranged on ivory fabric"
           className="absolute inset-0 h-full w-full object-cover opacity-42"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-matte-black via-matte-black/78 to-matte-black/20" />
-        <Container className="relative flex min-h-[calc(100vh-73px)] items-center py-20">
+        <Container className="relative flex min-h-[calc(100vh-73px)] items-start py-20">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="max-w-3xl"
+            className="pt-8 max-w-3xl"
           >
             <p className="text-xs font-semibold uppercase tracking-[0.35em] text-champagne-gold">
               Premium Luxury Jewellery
@@ -80,7 +81,10 @@ function Home() {
               {APP_TAGLINE}
             </p>
             <p className="mt-6 max-w-xl text-sm leading-8 text-ivory-white/70 md:text-base">
-              Sculpted for modern elegance with a focus on proportion, finish, and enduring wear.
+              Sculpted for modern elegance with a focus
+            </p>
+            <p className="mt-4 max-w-xl text-sm leading-8 text-ivory-white/70 md:text-base">
+              on proportion, finish, and enduring wear.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link to={ROUTES.SHOP}>

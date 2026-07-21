@@ -17,6 +17,8 @@ export function normalizeProduct(product) {
     collectionSlug: product.collection?.slug,
     category: product.category?.name,
     collection: product.collection?.name,
+    averageRating: product.averageRating ?? 0,
+    reviewCount: product.reviewCount ?? 0,
     badge: product.bestSeller ? 'Best Seller' : product.featured ? 'Featured' : '',
   };
 }

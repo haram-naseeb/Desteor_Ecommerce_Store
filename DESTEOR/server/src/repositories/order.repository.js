@@ -3,6 +3,13 @@ const prisma = require('../config/db');
 const orderInclude = {
   items: {
     orderBy: { createdAt: 'asc' },
+    include: {
+      product: {
+        select: {
+          slug: true,
+        },
+      },
+    },
   },
 };
 
@@ -23,7 +30,14 @@ const cartCheckoutInclude = {
 };
 
 function withTransaction(callback) {
-  return prisma.$transaction(callback);
+  // Neon connections can take longer than Prisma's default five-second
+  // interactive transaction window. Checkout still runs atomically; this
+  // simply gives its stock updates, order creation, and cart cleanup enough
+  // time to complete under normal network latency.
+  return prisma.$transaction(callback, {
+    maxWait: 10_000,
+    timeout: 20_000,
+  });
 }
 
 function findCartForCheckout(userId, client = prisma) {
@@ -31,6 +45,9 @@ function findCartForCheckout(userId, client = prisma) {
     where: { userId },
     include: cartCheckoutInclude,
   });
+}
+function findProductsForCheckout(items, client = prisma) {
+  return client.product.findMany({ where: { id: { in: items.map((item) => item.productId) } }, include: { images: { orderBy: { displayOrder: 'asc' }, take: 1 } } });
 }
 
 function findOrderNumber(orderNumber, client = prisma) {
@@ -93,6 +110,7 @@ module.exports = {
   createOrder,
   decrementProductStock,
   findCartForCheckout,
+  findProductsForCheckout,
   findOrderForUser,
   findOrderNumber,
   findOrdersByUserId,

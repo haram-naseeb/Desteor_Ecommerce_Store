@@ -30,13 +30,28 @@ function Navbar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isAccountDrawerOpen, setIsAccountDrawerOpen] = useState(false);
   const { currentUser, isAuthenticated, logout } = useAuth();
   const { totalItems } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
   const [search, setSearch] = useState('');
   const profileMenuRef = useRef(null);
-  const accountDrawerRef = useRef(null);
+
+  const mainLinks = [
+    { label: 'Home', to: ROUTES.HOME, icon: House },
+    { label: 'Shop', to: ROUTES.SHOP, icon: ShoppingBag },
+    { label: 'Wishlist', to: ROUTES.WISHLIST, icon: Heart },
+    { label: 'Cart', to: ROUTES.CART, icon: ShoppingCart },
+  ];
+
+  const accountItems = isAuthenticated
+    ? [
+        { label: 'Profile', to: ROUTES.PROFILE, icon: User },
+        { label: 'Orders', to: ROUTES.ORDERS, icon: Package },
+        { label: 'Wishlist', to: ROUTES.WISHLIST, icon: Heart },
+        { label: 'About', to: ROUTES.ABOUT, icon: Info },
+        { label: 'Contact', to: ROUTES.CONTACT, icon: Mail },
+      ]
+    : [];
 
   const mobileLinkClass = ({ isActive }) =>
     `flex items-center justify-between rounded-xl border border-ivory-white/10 px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] transition-colors ${
@@ -69,16 +84,6 @@ function Navbar() {
         { label: 'Register', to: ROUTES.REGISTER },
       ];
 
-  const profileItems = isAuthenticated
-    ? [
-        { label: 'Profile', to: ROUTES.PROFILE, icon: User },
-        { label: 'Orders', to: ROUTES.ORDERS, icon: Package },
-        { label: 'Wishlist', to: ROUTES.WISHLIST, icon: Heart },
-        { label: 'About', to: ROUTES.ABOUT, icon: Info },
-        { label: 'Contact', to: ROUTES.CONTACT, icon: Mail },
-      ]
-    : [];
-
   useEffect(() => {
     function handlePointerDown(event) {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
@@ -90,7 +95,6 @@ function Navbar() {
       if (event.key === 'Escape') {
         closeMenu();
         closeProfileMenu();
-        setIsAccountDrawerOpen(false);
       }
     }
 
@@ -102,40 +106,6 @@ function Navbar() {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-
-  useEffect(() => {
-    if (!isAccountDrawerOpen) return undefined;
-
-    const drawer = accountDrawerRef.current;
-    const previousActive = document.activeElement;
-    const focusableSelector = 'a, button, input, [tabindex]:not([tabindex="-1"])';
-    const focusable = drawer ? Array.from(drawer.querySelectorAll(focusableSelector)).filter((el) => !el.hasAttribute('disabled')) : [];
-    if (focusable.length) focusable[0].focus();
-
-    function onKeyDown(e) {
-      if (e.key === 'Escape') {
-        setIsAccountDrawerOpen(false);
-        return;
-      }
-      if (e.key === 'Tab' && focusable.length) {
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    }
-
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-      try { previousActive && previousActive.focus(); } catch (err) {}
-    };
-  }, [isAccountDrawerOpen]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
@@ -259,7 +229,7 @@ function Navbar() {
                         </p>
                       </div>
                       <div className="my-2 h-px bg-matte-black/10" />
-                      {profileItems.map((item) => {
+                      {accountItems.map((item) => {
                         const Icon = item.icon;
 
                         return (
@@ -361,15 +331,6 @@ function Navbar() {
 
           <button
             type="button"
-            className={`${iconButtonClass} lg:hidden mr-2`}
-            aria-label="Open account drawer"
-            onClick={() => setIsAccountDrawerOpen(true)}
-          >
-            <User className="h-4 w-4" aria-hidden="true" />
-          </button>
-
-          <button
-            type="button"
             className={`${iconButtonClass} lg:hidden`}
             aria-label={isOpen ? 'Close navigation' : 'Open navigation'}
             aria-expanded={isOpen}
@@ -398,13 +359,13 @@ function Navbar() {
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
-              transition={{ type: 'tween', duration: 0.25 }}
-              className="fixed inset-y-0 left-0 z-50 flex w-[min(18rem,85vw)] flex-col overflow-auto rounded-tr-2xl rounded-br-2xl border-r border-ivory-white/10 bg-matte-black text-ivory-white shadow-glow lg:hidden"
+              transition={{ type: 'tween', duration: 0.3 }}
+              className="fixed inset-y-0 left-0 z-50 flex h-screen w-[min(50vw,320px)] flex-col overflow-hidden rounded-tr-3xl border-r border-ivory-white/10 bg-matte-black p-6 text-ivory-white shadow-[16px_0_54px_rgba(0,0,0,0.35)] lg:hidden"
             >
-              <div className="flex items-center justify-between px-4 py-4">
+              <div className="flex items-center justify-between pb-6">
                 <div>
                   <span className="font-heading text-sm tracking-[0.25em] text-champagne-gold">DESTEOR</span>
-                  <p className="text-xs text-ivory-white/60">Customer navigation</p>
+                  <p className="text-xs text-ivory-white/60">Navigation</p>
                 </div>
                 <button
                   type="button"
@@ -416,181 +377,145 @@ function Navbar() {
                 </button>
               </div>
 
-              <div className="border-t border-ivory-white/10 px-4 pt-4">
-                <form onSubmit={submitSearch} className="relative mb-5">
-                  <label className="sr-only" htmlFor="mobile-navbar-search">Search products</label>
-                  <input
-                    id="mobile-navbar-search"
-                    autoComplete="off"
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                    placeholder="Search jewelry, styles"
-                    className="header-search w-full rounded-2xl border border-ivory-white/10 bg-matte-black/90 py-3.5 pl-5 pr-11 text-sm text-ivory-white placeholder:text-ivory-white/45 outline-none"
-                    style={{ color: '#fff', WebkitTextFillColor: '#fff' }}
-                  />
-                  <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-full bg-champagne-gold/14 text-champagne-gold" aria-label="Search products">
-                    <Search className="h-4 w-4" aria-hidden="true" />
-                  </button>
-                </form>
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                <div className="mb-8 overflow-y-auto pr-1">
+                  <form onSubmit={submitSearch} className="relative mb-8">
+                    <label className="sr-only" htmlFor="mobile-navbar-search">Search products</label>
+                    <input
+                      id="mobile-navbar-search"
+                      autoComplete="off"
+                      value={search}
+                      onChange={(event) => setSearch(event.target.value)}
+                      placeholder="Search jewelry, styles"
+                      className="header-search w-full rounded-3xl border border-ivory-white/10 bg-matte-black/90 py-4 pl-5 pr-14 text-sm text-ivory-white placeholder:text-ivory-white/45 outline-none"
+                      style={{ color: '#fff', WebkitTextFillColor: '#fff' }}
+                    />
+                    <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-full bg-champagne-gold/14 text-champagne-gold" aria-label="Search products">
+                      <Search className="h-4 w-4" aria-hidden="true" />
+                    </button>
+                  </form>
 
-                <nav className="grid gap-2">
-                  <NavLink
-                    to={ROUTES.HOME}
-                    className={({ isActive }) =>
-                      `flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-body transition-all duration-300 ${
-                        isActive
-                          ? 'bg-ivory-white/10 text-champagne-gold shadow-inner'
-                          : 'text-ivory-white/80 hover:-translate-y-0.5 hover:bg-ivory-white/10 hover:text-champagne-gold'
-                      }`
-                    }
-                    onClick={closeMenu}
-                  >
-                    <span>Home</span>
-                    <House className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
-                  </NavLink>
-                  <NavLink
-                    to={ROUTES.SHOP}
-                    className={({ isActive }) =>
-                      `flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-body transition-all duration-300 ${
-                        isActive
-                          ? 'bg-ivory-white/10 text-champagne-gold shadow-inner'
-                          : 'text-ivory-white/80 hover:-translate-y-0.5 hover:bg-ivory-white/10 hover:text-champagne-gold'
-                      }`
-                    }
-                    onClick={closeMenu}
-                  >
-                    <span>Shop</span>
-                    <ShoppingBag className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
-                  </NavLink>
-                  {isAuthenticated &&
-                    profileItems.map((item) => {
-                      const Icon = item.icon;
-                      return (
+                  <nav className="flex flex-col gap-3 pb-4">
+                    <NavLink
+                      to={ROUTES.HOME}
+                      className={({ isActive }) =>
+                        `flex items-center justify-between gap-3 rounded-[1.5rem] border border-ivory-white/10 bg-white/5 bg-opacity-5 px-6 py-5 text-base font-semibold transition-all duration-300 ${
+                          isActive
+                            ? 'bg-white/10 text-champagne-gold shadow-inner'
+                            : 'text-ivory-white/80 hover:-translate-y-0.5 hover:bg-white/10 hover:text-champagne-gold'
+                        }`
+                      }
+                      onClick={closeMenu}
+                    >
+                      <span>Home</span>
+                      <House className="h-5 w-5 text-champagne-gold" aria-hidden="true" />
+                    </NavLink>
+                    <NavLink
+                      to={ROUTES.SHOP}
+                      className={({ isActive }) =>
+                        `flex items-center justify-between gap-3 rounded-[1.5rem] border border-ivory-white/10 bg-white/5 bg-opacity-5 px-6 py-5 text-base font-semibold transition-all duration-300 ${
+                          isActive
+                            ? 'bg-white/10 text-champagne-gold shadow-inner'
+                            : 'text-ivory-white/80 hover:-translate-y-0.5 hover:bg-white/10 hover:text-champagne-gold'
+                        }`
+                      }
+                      onClick={closeMenu}
+                    >
+                      <span>Shop</span>
+                      <ShoppingBag className="h-5 w-5 text-champagne-gold" aria-hidden="true" />
+                    </NavLink>
+                    <NavLink
+                      to={ROUTES.WISHLIST}
+                      className={({ isActive }) =>
+                        `flex items-center justify-between gap-3 rounded-[1.5rem] border border-ivory-white/10 bg-white/5 bg-opacity-5 px-6 py-5 text-base font-semibold transition-all duration-300 ${
+                          isActive
+                            ? 'bg-white/10 text-champagne-gold shadow-inner'
+                            : 'text-ivory-white/80 hover:-translate-y-0.5 hover:bg-white/10 hover:text-champagne-gold'
+                        }`
+                      }
+                      onClick={closeMenu}
+                    >
+                      <span>Wishlist</span>
+                      <Heart className="h-5 w-5 text-champagne-gold" aria-hidden="true" />
+                    </NavLink>
+                    <NavLink
+                      to={ROUTES.CART}
+                      className={({ isActive }) =>
+                        `flex items-center justify-between gap-3 rounded-[1.5rem] border border-ivory-white/10 bg-white/5 bg-opacity-5 px-6 py-5 text-base font-semibold transition-all duration-300 ${
+                          isActive
+                            ? 'bg-white/10 text-champagne-gold shadow-inner'
+                            : 'text-ivory-white/80 hover:-translate-y-0.5 hover:bg-white/10 hover:text-champagne-gold'
+                        }`
+                      }
+                      onClick={closeMenu}
+                    >
+                      <span>Cart</span>
+                      <ShoppingCart className="h-5 w-5 text-champagne-gold" aria-hidden="true" />
+                    </NavLink>
+                    {isAuthenticated &&
+                      accountItems.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <NavLink
+                            key={item.label}
+                            to={item.to}
+                            className={({ isActive }) =>
+                              `flex items-center justify-between gap-3 rounded-[1.5rem] border border-ivory-white/10 bg-white/5 bg-opacity-5 px-6 py-5 text-base font-semibold transition-all duration-300 ${
+                                isActive
+                                  ? 'bg-white/10 text-champagne-gold shadow-inner'
+                                  : 'text-ivory-white/80 hover:-translate-y-0.5 hover:bg-white/10 hover:text-champagne-gold'
+                              }`
+                            }
+                            onClick={closeMenu}
+                          >
+                            <span>{item.label}</span>
+                            <Icon className="h-5 w-5 text-champagne-gold" aria-hidden="true" />
+                          </NavLink>
+                        );
+                      })}
+                    {!isAuthenticated &&
+                      authLinks.map((item) => (
                         <NavLink
                           key={item.label}
                           to={item.to}
                           className={({ isActive }) =>
-                            `flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-body transition-all duration-300 ${
+                            `flex items-center justify-between gap-3 rounded-[1.5rem] border border-ivory-white/10 bg-white/5 bg-opacity-5 px-6 py-5 text-base font-semibold transition-all duration-300 ${
                               isActive
-                                ? 'bg-ivory-white/10 text-champagne-gold shadow-inner'
-                                : 'text-ivory-white/80 hover:-translate-y-0.5 hover:bg-ivory-white/10 hover:text-champagne-gold'
+                                ? 'bg-white/10 text-champagne-gold shadow-inner'
+                                : 'text-ivory-white/80 hover:-translate-y-0.5 hover:bg-white/10 hover:text-champagne-gold'
                             }`
                           }
                           onClick={closeMenu}
                         >
                           <span>{item.label}</span>
-                          <Icon className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
                         </NavLink>
-                      );
-                    })}
+                      ))}
+                  </nav>
+                </div>
 
-                  {authLinks.map((item) => (
-                    <NavLink
-                      key={item.label}
-                      to={item.to}
-                      className={({ isActive }) =>
-                        `flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-body transition-all duration-300 ${
-                          isActive
-                            ? 'bg-ivory-white/10 text-champagne-gold shadow-inner'
-                            : 'text-ivory-white/80 hover:-translate-y-0.5 hover:bg-ivory-white/10 hover:text-champagne-gold'
-                        }`
-                      }
-                      onClick={closeMenu}
-                    >
-                      <span>{item.label}</span>
-                    </NavLink>
-                  ))}
+                <div className="my-6 h-px bg-ivory-white/10" />
 
-                  {isAuthenticated && (
+                <div className="mt-auto">
+                  {isAuthenticated ? (
                     <button
                       type="button"
                       onClick={() => {
                         handleLogout();
                         closeMenu();
                       }}
-                      className="flex items-center justify-between rounded-xl border border-ivory-white/10 px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-ivory-white/82 transition hover:bg-ivory-white/5 hover:text-champagne-gold"
+                      className="flex w-full items-center justify-between rounded-[1.5rem] border border-ivory-white/10 bg-white/5 bg-opacity-5 px-6 py-5 text-base font-semibold uppercase tracking-[0.2em] text-ivory-white/82 transition hover:bg-white/10 hover:text-champagne-gold"
                     >
                       <span>Logout</span>
-                      <LogOut className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
+                      <LogOut className="h-5 w-5 text-champagne-gold" aria-hidden="true" />
                     </button>
-                  )}
-                </nav>
-              </div>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {isAccountDrawerOpen && (
-          <>
-            <motion.button
-              type="button"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              className="fixed inset-0 z-40 bg-matte-black/60 backdrop-blur-sm lg:hidden"
-              aria-label="Close account drawer"
-              onClick={() => setIsAccountDrawerOpen(false)}
-            />
-
-            <motion.aside
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'tween', duration: 0.28 }}
-              className="fixed inset-y-0 left-0 z-50 w-[min(92vw,18rem)] flex flex-col overflow-auto rounded-tr-2xl rounded-br-2xl border-r border-ivory-white/10 bg-matte-black/98 p-4 lg:hidden"
-              ref={accountDrawerRef}
-              role="dialog"
-              aria-modal="true"
-              aria-label="Account drawer"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="grid h-10 w-10 place-items-center rounded-2xl bg-white/5 text-champagne-gold font-heading">D</span>
-                  <div>
-                    <p className="font-heading text-sm tracking-[0.25em] text-ivory-white">My Account</p>
-                    <p className="text-xs text-ivory-white/60">Manage your account</p>
-                  </div>
+                  ) : null}
                 </div>
-                <button type="button" onClick={() => setIsAccountDrawerOpen(false)} className="grid h-10 w-10 place-items-center rounded-xl border border-ivory-white/10 bg-white/5 text-ivory-white">
-                  <X className="h-5 w-5" aria-hidden="true" />
-                </button>
-              </div>
-
-              <div className="my-4 grid gap-2">
-                <NavLink to={ROUTES.PROFILE} className={mobileLinkClass} onClick={() => setIsAccountDrawerOpen(false)}>
-                  <span>Profile</span>
-                  <User className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
-                </NavLink>
-
-                <NavLink to={ROUTES.ORDERS} className={mobileLinkClass} onClick={() => setIsAccountDrawerOpen(false)}>
-                  <span>Orders</span>
-                  <Package className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
-                </NavLink>
-
-                <NavLink to={ROUTES.WISHLIST} className={mobileLinkClass} onClick={() => setIsAccountDrawerOpen(false)}>
-                  <span>Wishlist</span>
-                  <Heart className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
-                </NavLink>
-
-                <NavLink to={ROUTES.CART} className={mobileLinkClass} onClick={() => setIsAccountDrawerOpen(false)}>
-                  <span>Cart</span>
-                  <ShoppingCart className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
-                </NavLink>
-              </div>
-
-              <div className="mt-auto pt-4">
-                <button type="button" onClick={() => { handleLogout(); setIsAccountDrawerOpen(false); }} className="flex w-full items-center justify-between rounded-xl border border-ivory-white/10 px-4 py-3 text-left text-sm font-semibold uppercase tracking-[0.2em] text-ivory-white/82 transition hover:bg-ivory-white/5 hover:text-champagne-gold">
-                  <span>Logout</span>
-                  <LogOut className="h-4 w-4 text-champagne-gold" aria-hidden="true" />
-                </button>
               </div>
             </motion.aside>
           </>
         )}
       </AnimatePresence>
+
     </header>
   );
 }

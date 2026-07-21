@@ -1,7 +1,9 @@
 const repository = require('../repositories/review.repository');
 function error(message, statusCode) { const value = new Error(message); value.statusCode = statusCode; return value; }
 async function getReviews(productId) { const [reviews, summary] = await Promise.all([repository.findReviews(productId), repository.reviewSummary(productId)]); return { reviews, averageRating: summary._avg.rating || 0, reviewCount: summary._count._all }; }
-async function createReview(userId, productId, data) { try { await repository.createReview({ userId, productId, ...data }); } catch (cause) { if (cause.code === 'P2002') throw error('You have already reviewed this product.', 409); throw cause; } return getReviews(productId); }
+async function createReview(userId, productId, data) { const purchase = await repository.findDeliveredPurchase(userId, productId, data.orderId); if (!purchase) throw error('Reviews are available after this item has been delivered.', 403); try { await repository.createReview({ userId, productId, ...data }); } catch (cause) { if (cause.code === 'P2002') throw error('You have already reviewed this item for this order.', 409); throw cause; } return getReviews(productId); }
 async function updateReview(userId, id, data) { const review = await repository.findReview(id); if (!review) throw error('Review not found.', 404); if (review.userId !== userId) throw error('You can only edit your own reviews.', 403); await repository.updateReview(id, data); return getReviews(review.productId); }
 async function removeReview(userId, id) { const review = await repository.findReview(id); if (!review) throw error('Review not found.', 404); if (review.userId !== userId) throw error('You can only delete your own reviews.', 403); await repository.deleteReview(id); return getReviews(review.productId); }
-module.exports = { getReviews, createReview, updateReview, removeReview };
+async function getAdminReviews() { return repository.findReviewsForAdmin(); }
+async function removeReviewByAdmin(id) { const review = await repository.findReview(id); if (!review) throw error('Review not found.', 404); await repository.deleteReview(id); }
+module.exports = { getReviews, createReview, updateReview, removeReview, getAdminReviews, removeReviewByAdmin };

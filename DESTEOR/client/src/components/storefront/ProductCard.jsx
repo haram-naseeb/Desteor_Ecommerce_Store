@@ -1,4 +1,4 @@
-import { ArrowUpRight, Heart, ShoppingBag } from 'lucide-react';
+import { ArrowUpRight, Heart, ShoppingBag, Star } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import Button from '@/components/ui/Button';
@@ -78,16 +78,25 @@ function ProductCard({ product }) {
               aria-hidden="true"
             />
           </div>
-          <div className="mt-3 flex items-center gap-2 text-sm font-semibold text-matte-black">
-            {product.salePrice ? (
-              <>
-                <span>{formatPrice(product.salePrice)}</span>
-                <span className="text-xs font-medium text-matte-black/45 line-through">
-                  {formatPrice(product.price)}
-                </span>
-              </>
-            ) : (
-              <span>{formatPrice(product.price)}</span>
+          <div className="mt-3 flex flex-col gap-2 text-sm">
+            <div className="flex items-center gap-2 font-semibold text-matte-black">
+              {product.salePrice ? (
+                <>
+                  <span>{formatPrice(product.salePrice)}</span>
+                  <span className="text-xs font-medium text-matte-black/45 line-through">
+                    {formatPrice(product.price)}
+                  </span>
+                </>
+              ) : (
+                <span>{formatPrice(product.price)}</span>
+              )}
+            </div>
+            {product.reviewCount > 0 && (
+              <div className="flex items-center gap-2 text-sm text-matte-black/70">
+                <Star className="h-4 w-4 fill-champagne-gold text-champagne-gold" aria-hidden="true" />
+                <span className="font-semibold">{product.averageRating.toFixed(1)}</span>
+                <span className="text-matte-black/50">({product.reviewCount})</span>
+              </div>
             )}
           </div>
         </Link>

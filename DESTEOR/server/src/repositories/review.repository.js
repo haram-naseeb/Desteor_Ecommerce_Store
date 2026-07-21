@@ -6,4 +6,6 @@ const findReview = (id) => prisma.review.findUnique({ where: { id }, include: re
 const createReview = (data) => prisma.review.create({ data, include: reviewInclude });
 const updateReview = (id, data) => prisma.review.update({ where: { id }, data, include: reviewInclude });
 const deleteReview = (id) => prisma.review.delete({ where: { id } });
-module.exports = { findReviews, reviewSummary, findReview, createReview, updateReview, deleteReview };
+const findDeliveredPurchase = (userId, productId, orderId) => prisma.order.findFirst({ where: { id: orderId, userId, status: 'DELIVERED', items: { some: { productId } } }, select: { id: true } });
+const findReviewsForAdmin = () => prisma.review.findMany({ include: { user: { select: { firstName: true, lastName: true, email: true } }, product: { select: { name: true } } }, orderBy: { createdAt: 'desc' } });
+module.exports = { findReviews, reviewSummary, findReview, createReview, updateReview, deleteReview, findDeliveredPurchase, findReviewsForAdmin };

@@ -21,11 +21,13 @@ function mapOrderItem(item) {
   return {
     id: item.id,
     productId: item.productId,
+    productSlug: item.product?.slug || null,
     quantity: item.quantity,
     unitPrice: item.unitPrice,
     subtotal: item.unitPrice * item.quantity,
     productNameSnapshot: item.productNameSnapshot,
     productImageSnapshot: item.productImageSnapshot,
+    subtotal: item.subtotal,
     createdAt: item.createdAt,
   };
 }
@@ -35,6 +37,13 @@ function mapOrder(order) {
     id: order.id,
     orderNumber: order.orderNumber,
     status: order.status,
+    customerName: order.customerName,
+    phone: order.phone,
+    address: order.address,
+    city: order.city,
+    postalCode: order.postalCode,
+    notes: order.notes,
+    paymentMethod: order.paymentMethod,
     subtotal: order.subtotal,
     shipping: order.shipping,
     total: order.total,
@@ -77,17 +86,25 @@ function validateCartForCheckout(cart) {
   }
 }
 
-async function checkout(userId) {
+async function checkout(userId, details) {
   return orderRepository.withTransaction(async (client) => {
-    const cart = await orderRepository.findCartForCheckout(userId, client);
-    validateCartForCheckout(cart);
+    const cart = userId ? await orderRepository.findCartForCheckout(userId, client) : null;
+    let checkoutItems = cart?.items;
+    if (!userId) {
+      const products = await orderRepository.findProductsForCheckout(details.items, client);
+      const quantities = new Map(details.items.map((item) => [item.productId, Number(item.quantity) || 1]));
+      checkoutItems = products.map((product) => ({ productId: product.id, quantity: quantities.get(product.id), product }));
+      if (checkoutItems.length !== details.items.length) throw createError('One or more products are unavailable.', 422);
+    }
+    validateCartForCheckout({ items: checkoutItems });
 
-    const orderItems = cart.items.map((item) => ({
+    const orderItems = checkoutItems.map((item) => ({
       productId: item.productId,
       quantity: item.quantity,
       unitPrice: getUnitPrice(item.product),
       productNameSnapshot: item.product.name,
       productImageSnapshot: getProductImage(item.product),
+      subtotal: getUnitPrice(item.product) * item.quantity,
     }));
     const subtotal = orderItems.reduce(
       (sum, item) => sum + item.unitPrice * item.quantity,
@@ -97,7 +114,7 @@ async function checkout(userId) {
     const total = subtotal + shipping;
     const orderNumber = await generateOrderNumber(client);
 
-    for (const item of cart.items) {
+    for (const item of checkoutItems) {
       const result = await orderRepository.decrementProductStock(
         { productId: item.productId, quantity: item.quantity },
         client
@@ -115,7 +132,9 @@ async function checkout(userId) {
       {
         order: {
           orderNumber,
-          userId,
+          userId: userId || null,
+          customerName: details.customerName.trim(), phone: details.phone.trim(), address: details.address.trim(), city: details.city.trim(),
+          postalCode: details.postalCode?.trim() || null, notes: details.notes?.trim() || null, paymentMethod: details.paymentMethod,
           subtotal,
           shipping,
           total,
@@ -126,7 +145,7 @@ async function checkout(userId) {
       client
     );
 
-    await orderRepository.clearCartItems(cart.id, client);
+    if (cart) await orderRepository.clearCartItems(cart.id, client);
     return mapOrder(order);
   });
 }

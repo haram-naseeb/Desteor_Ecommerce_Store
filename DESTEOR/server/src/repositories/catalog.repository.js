@@ -102,6 +102,23 @@ function findCollectionBySlug(slug) {
   });
 }
 
+function findReviewSummaries(productIds) {
+  return prisma.review.groupBy({
+    by: ['productId'],
+    where: {
+      productId: {
+        in: productIds,
+      },
+    },
+    _avg: {
+      rating: true,
+    },
+    _count: {
+      _all: true,
+    },
+  });
+}
+
 module.exports = {
   findBestSellerProducts,
   findCategories,
@@ -112,5 +129,6 @@ module.exports = {
   findProductBySlug,
   findProducts,
   findRelatedProducts,
+  findReviewSummaries,
   productInclude,
 };

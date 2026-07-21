@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Heart, Shield, ShoppingBag, Truck } from 'lucide-react';
+import { Heart, Shield, ShoppingBag, Star, Truck } from 'lucide-react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import Breadcrumbs from '@/components/storefront/Breadcrumbs';
@@ -32,6 +32,7 @@ function ProductDetails() {
   const [error, setError] = useState('');
   const [actionMessage, setActionMessage] = useState('');
   const [actionError, setActionError] = useState('');
+  const [reviewSummary, setReviewSummary] = useState({ averageRating: 0, reviewCount: 0 });
   const pendingHandledRef = useRef(false);
   const pendingWishlistHandledRef = useRef(false);
 
@@ -236,6 +237,13 @@ function ProductDetails() {
           <p className="mt-4 text-sm font-semibold uppercase tracking-[0.22em] text-matte-black/55">
             {product.categoryName} / {stockLabel}
           </p>
+          <p className="mt-4 inline-flex items-center gap-2 text-sm text-matte-black/75">
+            <span className="inline-flex items-center gap-1 rounded-full border border-matte-black/10 bg-ivory-white px-3 py-1 text-sm font-semibold text-matte-black">
+              <Star className="h-4 w-4 fill-champagne-gold text-champagne-gold" />
+              {reviewSummary.averageRating.toFixed(1)}
+            </span>
+            <span className="text-sm text-matte-black/60">({reviewSummary.reviewCount} reviews)</span>
+          </p>
           <p className="mt-6 leading-8 text-matte-black/68">{product.description}</p>
 
           {location.state?.notice && (
@@ -330,7 +338,11 @@ function ProductDetails() {
           <ProductGrid products={relatedProducts} />
         </div>
       </section>
-      <ReviewSection productId={product.id} />
+      <ReviewSection
+        productId={product.id}
+        initialOrderId={location.state?.orderId}
+        onSummary={setReviewSummary}
+      />
     </Container>
   );
 }

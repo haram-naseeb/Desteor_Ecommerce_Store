@@ -7,7 +7,10 @@ import Container from '@/components/ui/Container';
 import Loader from '@/components/ui/Loader';
 import { ROUTES } from '@/constants/routes';
 import { getOrderById } from '@/services/order.service';
+import { createReview } from '@/services/review.service';
 import { formatPrice } from '@/utils/format';
+
+const TIMELINE = ['PENDING', 'CONFIRMED', 'PREPARING', 'SHIPPED', 'DELIVERED'];
 
 function SummaryLine({ label, value, strong = false }) {
   return (
@@ -102,6 +105,15 @@ function OrderDetails() {
             <p className="mt-3 text-sm text-matte-black/58">{order.dateLabel}</p>
           </div>
 
+          {order.status !== 'CANCELLED' && (
+            <ol className="mt-7 grid grid-cols-5 gap-2" aria-label="Order progress">
+              {TIMELINE.map((status) => {
+                const active = TIMELINE.indexOf(status) <= TIMELINE.indexOf(order.status);
+                return <li key={status} className="text-center"><span className={`mx-auto block h-3 w-3 rounded-full ${active ? 'bg-champagne-gold' : 'bg-matte-black/15'}`} /><span className={`mt-2 block text-[10px] font-semibold tracking-wide ${active ? 'text-matte-black' : 'text-matte-black/40'}`}>{status}</span></li>;
+              })}
+            </ol>
+          )}
+
           <div className="mt-8 space-y-4">
             {order.items.map((item) => (
               <article
@@ -146,9 +158,24 @@ function OrderDetails() {
           <div className="mt-6 border-t border-matte-black/10 pt-5">
             <SummaryLine label="Total" value={formatPrice(order.total)} strong />
           </div>
+          <div className="mt-6 border-t border-matte-black/10 pt-5 text-sm leading-6 text-matte-black/65">
+            <p className="font-semibold text-matte-black">Delivery details</p>
+            <p className="mt-2">{order.customerName}<br />{order.phone}<br />{order.address}, {order.city}</p>
+            <p className="mt-3"><span className="font-semibold">Payment:</span> {order.paymentMethod === 'ONLINE' ? 'Online Payment' : 'Cash on Delivery'}</p>
+            {order.notes && <p className="mt-2"><span className="font-semibold">Notes:</span> {order.notes}</p>}
+          </div>
+          {order.status === 'DELIVERED' && order.items[0]?.productSlug && (
+            <Link
+              to={`/shop/${order.items[0].productSlug}`}
+              state={{ orderId: order.id }}
+              className="mt-6 inline-flex items-center gap-2 rounded-full border border-champagne-gold/20 bg-champagne-gold/10 px-4 py-2 text-sm font-semibold text-matte-black transition hover:bg-champagne-gold/15"
+            >
+              Leave product feedback
+            </Link>
+          )}
           <Link
             to={ROUTES.ORDERS}
-            className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-matte-black/62 transition hover:text-champagne-gold"
+            className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-matte-black/62 transition hover:text-champagne-gold"
           >
             <FiArrowLeft aria-hidden="true" />
             Back to orders

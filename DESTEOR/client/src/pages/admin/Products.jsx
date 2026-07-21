@@ -26,6 +26,21 @@ const emptyProduct = {
   images: [],
   specifications: [],
 };
+
+function createEmptySpecification() {
+  return { id: crypto.randomUUID(), label: '', value: '' };
+}
+
+function normalizeSlug(value) {
+  return value
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
 const acceptedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
 function Products() {
@@ -117,8 +132,21 @@ function Products() {
       setError('Upload at least one product image.');
       return;
     }
+
+    const fallbackCollectionId = record.collectionId || collections[0]?.id;
+    if (!fallbackCollectionId) {
+      setError('Add at least one collection before creating a product.');
+      return;
+    }
+
     try {
-      await saveAdminProduct(record);
+      await saveAdminProduct({
+        ...record,
+        collectionId: fallbackCollectionId,
+        specifications: (record.specifications || []).filter(
+          (item) => item.label?.trim() || item.value?.trim()
+        ),
+      });
       setRecord(null);
       load(search);
     } catch (err) {
@@ -150,7 +178,15 @@ function Products() {
           </p>
           <h1 className="font-heading text-3xl">Products</h1>
         </div>
-        <Button onClick={() => setRecord({ ...emptyProduct, images: [], specifications: [] })}>
+        <Button
+          onClick={() =>
+            setRecord({
+              ...emptyProduct,
+              images: [],
+              specifications: [createEmptySpecification()],
+            })
+          }
+        >
           <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
           Add product
         </Button>
@@ -198,10 +234,10 @@ function Products() {
                     className="mr-3 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-champagne-gold transition hover:bg-champagne-gold/10"
                     onClick={() =>
                       setRecord({
-                        ...item,
-                        images: [...item.images],
-                        specifications: [...item.specifications],
-                      })
+  ...item,
+  images: [...item.images],
+  specifications: item.specifications.map((s) => ({ id: crypto.randomUUID(), ...s })),
+})
                     }
                   >
                     <Edit2 className="h-4 w-4" aria-hidden="true" />
@@ -223,17 +259,31 @@ function Products() {
         title={`${record?.id ? 'Edit' : 'Add'} product`}
       >
         <form onSubmit={submit} className="max-h-[70vh] space-y-4 overflow-y-auto pr-2">
-          {['name', 'slug', 'description'].map((field) => (
+          {[
+            { field: 'name', label: 'Product name' },
+            { field: 'slug', label: 'Slug' },
+            { field: 'description', label: 'Description' },
+          ].map(({ field, label }) => (
             <Input
               key={field}
+              id={field}
+              label={label}
               required
               value={record?.[field] || ''}
-              placeholder={field}
-              onChange={(event) => setRecord({ ...record, [field]: event.target.value })}
+              placeholder={label}
+              onChange={(event) => {
+                const value = event.target.value;
+                setRecord({
+                  ...record,
+                  [field]: field === 'slug' ? normalizeSlug(value) : value,
+                });
+              }}
             />
           ))}
           <div className="grid grid-cols-2 gap-3">
             <Input
+              id="price"
+              label="Price"
               required
               type="number"
               min="0"
@@ -243,6 +293,8 @@ function Products() {
               }
             />
             <Input
+              id="stock"
+              label="Stock"
               required
               type="number"
               min="0"
@@ -260,21 +312,6 @@ function Products() {
           >
             <option value="">Choose category</option>
             {categories.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-          <select
-            required
-            value={record?.collectionId || ''}
-            onChange={(event) =>
-              setRecord({ ...record, collectionId: event.target.value })
-            }
-            className="w-full"
-          >
-            <option value="">Choose collection</option>
-            {collections.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.name}
               </option>
@@ -344,27 +381,58 @@ function Products() {
               ))}
             </div>
           </section>
-          <label className="block text-sm">
-            Specifications: Label: Value
-            <textarea
-              value={(record?.specifications || [])
-                .map((item) => `${item.label}: ${item.value}`)
-                .join('\n')}
-              onChange={(event) =>
-                setRecord({
-                  ...record,
-                  specifications: event.target.value
-                    .split('\n')
-                    .filter(Boolean)
-                    .map((line) => {
-                      const [label, ...values] = line.split(':');
-                      return { label: label.trim(), value: values.join(':').trim() };
-                    }),
-                })
-              }
-              className="mt-1 w-full rounded-xl border border-matte-black/15 bg-ivory-white/95 px-4 py-3 text-sm shadow-sm"
-            />
-          </label>
+          <section className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-body text-sm font-medium text-matte-black">Specifications</p>
+              <button
+                type="button"
+                onClick={() =>
+                  setRecord({
+                    ...record,
+                    specifications: [
+                      ...(record?.specifications || []),
+                      createEmptySpecification(),
+                    ],
+                  })
+                }
+                className="rounded-xl border border-matte-black/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-matte-black transition hover:border-champagne-gold hover:text-champagne-gold"
+              >
+                Add specification
+              </button>
+            </div>
+            {(record?.specifications || []).map((item, index) => (
+            <div key={item.id ?? index} className="grid gap-3 md:grid-cols-2">
+                <Input
+                  id={`spec-label-${index}`}
+                  label="Specification label"
+                  value={item.label || ''}
+                  placeholder="Label"
+                  onChange={(event) => {
+                    const nextSpecifications = [...(record?.specifications || [])];
+                    nextSpecifications[index] = {
+                      ...nextSpecifications[index],
+                      label: event.target.value,
+                    };
+                    setRecord({ ...record, specifications: nextSpecifications });
+                  }}
+                />
+                <Input
+                  id={`spec-value-${index}`}
+                  label="Specification value"
+                  value={item.value || ''}
+                  placeholder="Value"
+                  onChange={(event) => {
+                    const nextSpecifications = [...(record?.specifications || [])];
+                    nextSpecifications[index] = {
+                      ...nextSpecifications[index],
+                      value: event.target.value,
+                    };
+                    setRecord({ ...record, specifications: nextSpecifications });
+                  }}
+                />
+              </div>
+            ))}
+          </section>
           <Button type="submit" disabled={uploading} className="w-full">
             {uploading ? 'Uploading…' : 'Save product'}
           </Button>

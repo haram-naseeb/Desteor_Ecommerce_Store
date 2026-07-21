@@ -175,13 +175,6 @@ function AdminLayout() {
                 </h1>
               </div>
             </div>
-            <button
-              type="button"
-              className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-matte-black/10 bg-white px-3 py-2 text-sm text-matte-black/70 shadow-sm transition hover:border-champagne-gold hover:text-matte-black sm:px-4"
-            >
-              <Settings className="h-4 w-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Settings</span>
-            </button>
           </div>
         </header>
 
