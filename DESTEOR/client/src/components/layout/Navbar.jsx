@@ -359,7 +359,7 @@ function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'tween', duration: 0.3 }}
-              className="fixed inset-y-0 left-0 z-50 flex h-screen w-[min(50vw,320px)] flex-col overflow-hidden rounded-tr-3xl border-r border-ivory-white/10 bg-matte-black p-6 text-ivory-white shadow-[16px_0_54px_rgba(0,0,0,0.35)] lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 flex h-screen w-[min(88vw,400px)] flex-col overflow-hidden rounded-tr-3xl border-r border-ivory-white/10 bg-matte-black p-6 text-ivory-white shadow-[16px_0_54px_rgba(0,0,0,0.35)] lg:hidden"
             >
               <div className="flex items-center justify-between pb-6">
                 <div>

@@ -468,38 +468,63 @@ function About() {
       </Section>
 
       {/* Mission */}
-      <Section className="bg-matte-black text-ivory-white">
-        <Container className="mx-auto max-w-2xl text-center">
-          <motion.p
-            variants={fadeUp}
+      <Section tone="dark" className="relative overflow-hidden">
+        <FloatingOrbs />
+        <Container className="relative grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-20">
+          <motion.div
+            variants={fadeLeft}
             initial="hidden"
             whileInView="visible"
             viewport={viewport}
-            className="text-xs font-semibold uppercase tracking-[0.3em] text-champagne-gold"
           >
-            Our Mission
-          </motion.p>
-          <motion.h2
-            variants={fadeUp}
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-champagne-gold">
+              Our Mission
+            </p>
+            <h2 className="mt-5 max-w-xl text-4xl leading-tight md:text-5xl">
+              Elegance should feel within reach.
+            </h2>
+            <p className="mt-6 max-w-xl text-base leading-8 text-ivory-white/72 md:text-lg">
+              We make refined artificial jewellery for the moments that matter:
+              beautifully finished, comfortable to wear, and priced to be part
+              of everyday life.
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={fadeRight}
             initial="hidden"
             whileInView="visible"
             viewport={viewport}
-            transition={{ delay: 0.1 }}
-            className="mt-4 text-3xl md:text-4xl"
+            className="grid divide-y divide-ivory-white/10 border-y border-ivory-white/10"
           >
-            Elegance made accessible
-          </motion.h2>
-          <motion.p
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewport}
-            transition={{ delay: 0.2 }}
-            className="mt-6 text-base leading-8 text-ivory-white/70"
-          >
-            To bring elegant artificial jewellery to everyone by combining
-            timeless design, premium craftsmanship, and affordable luxury.
-          </motion.p>
+            <div className="py-5 first:pt-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-champagne-gold">
+                Timeless by design
+              </p>
+              <p className="mt-2 text-sm leading-7 text-ivory-white/68">
+                Considered silhouettes that move effortlessly between daily wear
+                and celebrations.
+              </p>
+            </div>
+            <div className="py-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-champagne-gold">
+                Made to be worn
+              </p>
+              <p className="mt-2 text-sm leading-7 text-ivory-white/68">
+                A thoughtful balance of finish, comfort, and lasting shine in
+                every piece.
+              </p>
+            </div>
+            <div className="py-5 last:pb-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-champagne-gold">
+                Luxury without distance
+              </p>
+              <p className="mt-2 text-sm leading-7 text-ivory-white/68">
+                Premium-looking jewellery made accessible for every story worth
+                dressing up for.
+              </p>
+            </div>
+          </motion.div>
         </Container>
       </Section>
 
