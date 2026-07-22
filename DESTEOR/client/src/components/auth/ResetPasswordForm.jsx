@@ -10,9 +10,6 @@ import Loader from '@/components/ui/Loader';
 import { ROUTES } from '@/constants/routes';
 import { resetPassword } from '@/services/auth.service';
 
-const passwordPattern =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-
 function ResetPasswordForm() {
   const { token } = useParams();
   const navigate = useNavigate();
@@ -43,7 +40,7 @@ function ResetPasswordForm() {
       <AuthFormHeader
         eyebrow="Secure Reset"
         title="Reset Password"
-        description="Choose a new password with the required strength rules."
+        description="Choose a new password with at least 8 characters."
       />
       <FormAlert>{formError}</FormAlert>
       <FormAlert type="success">{success}</FormAlert>
@@ -51,19 +48,19 @@ function ResetPasswordForm() {
         <PasswordInput
           id="password"
           label="New Password"
+          hideLabel
+          placeholder="New password"
           error={errors.password?.message}
           {...register('password', {
             required: 'Password is required.',
-            pattern: {
-              value: passwordPattern,
-              message:
-                'Use 8+ characters with uppercase, lowercase, number, and special character.',
-            },
+            minLength: { value: 8, message: 'Password must be at least 8 characters long.' },
           })}
         />
         <PasswordInput
           id="confirmPassword"
           label="Confirm New Password"
+          hideLabel
+          placeholder="Confirm new password"
           error={errors.confirmPassword?.message}
           {...register('confirmPassword', {
             required: 'Confirm password is required.',

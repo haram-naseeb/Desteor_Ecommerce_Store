@@ -11,9 +11,6 @@ import Loader from '@/components/ui/Loader';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/useAuth';
 
-const passwordPattern =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-
 function RegisterForm() {
   const navigate = useNavigate();
   const { register: registerAccount } = useAuth();
@@ -57,18 +54,24 @@ function RegisterForm() {
         <Input
           id="firstName"
           label="First Name"
+          hideLabel
+          placeholder="First name"
           error={errors.firstName?.message}
           {...register('firstName', { required: 'First name is required.' })}
         />
         <Input
           id="lastName"
           label="Last Name"
+          hideLabel
+          placeholder="Last name"
           error={errors.lastName?.message}
           {...register('lastName', { required: 'Last name is required.' })}
         />
         <Input
           id="email"
           label="Email"
+          hideLabel
+          placeholder="Email address"
           type="email"
           className="sm:col-span-2"
           error={errors.email?.message}
@@ -77,20 +80,20 @@ function RegisterForm() {
         <PasswordInput
           id="password"
           label="Password"
+          hideLabel
+          placeholder="Password"
           className="sm:col-span-2"
           error={errors.password?.message}
           {...register('password', {
             required: 'Password is required.',
-            pattern: {
-              value: passwordPattern,
-              message:
-                'Use 8+ characters with uppercase, lowercase, number, and special character.',
-            },
+            minLength: { value: 8, message: 'Password must be at least 8 characters long.' },
           })}
         />
         <PasswordInput
           id="confirmPassword"
           label="Confirm Password"
+          hideLabel
+          placeholder="Confirm password"
           className="sm:col-span-2"
           error={errors.confirmPassword?.message}
           {...register('confirmPassword', {

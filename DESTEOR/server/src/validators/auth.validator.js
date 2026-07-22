@@ -4,22 +4,6 @@ const PASSWORD_RULES = [
     test: (value) => value.length >= 8,
     message: 'Password must be at least 8 characters long.',
   },
-  {
-    test: (value) => /[A-Z]/.test(value),
-    message: 'Password must include at least one uppercase letter.',
-  },
-  {
-    test: (value) => /[a-z]/.test(value),
-    message: 'Password must include at least one lowercase letter.',
-  },
-  {
-    test: (value) => /\d/.test(value),
-    message: 'Password must include at least one number.',
-  },
-  {
-    test: (value) => /[^A-Za-z0-9]/.test(value),
-    message: 'Password must include at least one special character.',
-  },
 ];
 
 function sendValidationErrors(res, errors) {

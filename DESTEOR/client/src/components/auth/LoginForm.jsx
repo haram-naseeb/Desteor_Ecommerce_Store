@@ -61,6 +61,8 @@ function LoginForm() {
         <Input
           id="email"
           label="Email"
+          hideLabel
+          placeholder="Email address"
           type="email"
           error={errors.email?.message}
           {...register('email', { required: 'Email is required.' })}
@@ -68,6 +70,8 @@ function LoginForm() {
         <PasswordInput
           id="password"
           label="Password"
+          hideLabel
+          placeholder="Password"
           error={errors.password?.message}
           {...register('password', { required: 'Password is required.' })}
         />

@@ -2,21 +2,24 @@ import { forwardRef, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
 const PasswordInput = forwardRef(function PasswordInput(
-  { id, label, error, className = '', ...rest },
+  { id, label, error, className = '', hideLabel = false, ...rest },
   ref
 ) {
   const [isVisible, setIsVisible] = useState(false);
 
   return (
     <div className="flex w-full flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-medium text-matte-black/80">
-        {label}
-      </label>
+      {!hideLabel && (
+        <label htmlFor={id} className="text-sm font-medium text-matte-black/80">
+          {label}
+        </label>
+      )}
       <div className="relative">
         <input
           id={id}
           ref={ref}
           type={isVisible ? 'text' : 'password'}
+          aria-label={hideLabel ? label : undefined}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${id}-error` : undefined}
           className={`w-full rounded-xl border bg-ivory-white/95 px-4 py-3 pr-11 text-sm text-matte-black placeholder:text-matte-black/35 shadow-sm focus:outline-none focus:ring-4 focus:ring-champagne-gold/12 ${

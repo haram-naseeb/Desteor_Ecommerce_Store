@@ -8,12 +8,12 @@ import { forwardRef } from 'react';
  * without any wrapper gymnastics.
  */
 const Input = forwardRef(function Input(
-  { label, id, error, type = 'text', className = '', ...rest },
+  { label, id, error, type = 'text', className = '', hideLabel = false, ...rest },
   ref
 ) {
   return (
     <div className="flex w-full flex-col gap-1.5">
-      {label && (
+      {label && !hideLabel && (
         <label
           htmlFor={id}
           className="font-body text-sm font-medium text-matte-black/80"
@@ -25,6 +25,7 @@ const Input = forwardRef(function Input(
         id={id}
         ref={ref}
         type={type}
+        aria-label={hideLabel ? label : undefined}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${id}-error` : undefined}
         className={`

@@ -52,6 +52,8 @@ function ForgotPasswordForm() {
       <Input
         id="email"
         label="Email"
+        hideLabel
+        placeholder="Email address"
         type="email"
         error={errors.email?.message}
         {...register('email', { required: 'Email is required.' })}
