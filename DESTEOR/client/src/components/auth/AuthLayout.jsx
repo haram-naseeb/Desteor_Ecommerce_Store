@@ -3,10 +3,12 @@ import { Link, Outlet } from 'react-router-dom';
 
 import { APP_NAME, APP_TAGLINE } from '@/constants/app';
 import { ROUTES } from '@/constants/routes';
+import ScrollToTop from '@/components/ScrollToTop';
 
 function AuthLayout() {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-matte-black px-6 py-12">
+      <ScrollToTop />
       <img
         src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1800&q=80"
         alt=""

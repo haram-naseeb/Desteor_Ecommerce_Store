@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 
 import Navbar from '@/components/layout/Navbar';
+import ScrollToTop from '@/components/ScrollToTop';
 
 /**
  * MainLayout
@@ -12,6 +13,7 @@ import Navbar from '@/components/layout/Navbar';
 function MainLayout() {
   return (
     <div className="flex min-h-screen flex-col bg-transparent">
+      <ScrollToTop />
       <Navbar />
 
       <main className="flex-1">

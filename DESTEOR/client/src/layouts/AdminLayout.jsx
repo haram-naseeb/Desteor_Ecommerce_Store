@@ -16,6 +16,7 @@ import {
 import { ROUTES } from '@/constants/routes';
 import { APP_NAME } from '@/constants/app';
 import { useAuth } from '@/hooks/useAuth';
+import ScrollToTop from '@/components/ScrollToTop';
 
 /**
  * AdminLayout
@@ -113,6 +114,7 @@ function AdminLayout() {
 
   return (
     <div className="flex min-h-screen bg-transparent">
+      <ScrollToTop />
       <aside className="hidden w-72 shrink-0 flex-col border-r border-matte-black/10 bg-matte-black text-ivory-white shadow-glow lg:flex">
         <AdminSidebar />
       </aside>
