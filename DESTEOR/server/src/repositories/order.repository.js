@@ -95,8 +95,8 @@ function findOrdersByUserId(userId) {
   });
 }
 
-function findOrderForUser({ orderId, userId }) {
-  return prisma.order.findFirst({
+function findOrderForUser({ orderId, userId }, client = prisma) {
+  return client.order.findFirst({
     where: {
       id: orderId,
       userId,
@@ -105,7 +105,22 @@ function findOrderForUser({ orderId, userId }) {
   });
 }
 
+function cancelPendingOrder({ orderId, userId }, client = prisma) {
+  return client.order.updateMany({
+    where: { id: orderId, userId, status: 'PENDING' },
+    data: { status: 'CANCELLED' },
+  });
+}
+
+function restoreProductStock({ productId, quantity }, client = prisma) {
+  return client.product.update({
+    where: { id: productId },
+    data: { stock: { increment: quantity } },
+  });
+}
+
 module.exports = {
+  cancelPendingOrder,
   clearCartItems,
   createOrder,
   decrementProductStock,
@@ -114,5 +129,6 @@ module.exports = {
   findOrderForUser,
   findOrderNumber,
   findOrdersByUserId,
+  restoreProductStock,
   withTransaction,
 };

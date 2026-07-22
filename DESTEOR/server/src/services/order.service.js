@@ -165,7 +165,29 @@ async function getOrderById(userId, orderId) {
   return mapOrder(order);
 }
 
+async function cancelOrder(userId, orderId) {
+  return orderRepository.withTransaction(async (client) => {
+    const order = await orderRepository.findOrderForUser({ orderId, userId }, client);
+
+    if (!order) {
+      throw createError('Order not found.', 404);
+    }
+
+    const cancellation = await orderRepository.cancelPendingOrder({ orderId, userId }, client);
+    if (cancellation.count !== 1) {
+      throw createError('This order can no longer be cancelled because it has already been confirmed.', 409);
+    }
+
+    await Promise.all(
+      order.items.map((item) => orderRepository.restoreProductStock({ productId: item.productId, quantity: item.quantity }, client))
+    );
+
+    return mapOrder({ ...order, status: 'CANCELLED', updatedAt: new Date() });
+  });
+}
+
 module.exports = {
+  cancelOrder,
   checkout,
   getOrderById,
   getOrders,

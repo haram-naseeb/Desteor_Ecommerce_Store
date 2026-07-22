@@ -25,3 +25,8 @@ export async function getOrderById(orderId) {
   const response = await api.get(`/orders/${orderId}`);
   return normalizeOrder(response.data.data.order);
 }
+
+export async function cancelOrder(orderId) {
+  const response = await api.patch('/orders/' + orderId + '/cancel');
+  return normalizeOrder(response.data.data.order);
+}

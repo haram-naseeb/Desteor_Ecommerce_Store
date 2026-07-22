@@ -12,6 +12,7 @@ const router = express.Router();
 router.post('/checkout', optionalProtect, validateCheckout, orderController.checkout);
 router.use(protect);
 router.get('/', orderController.getOrders);
+router.patch('/:id/cancel', validateOrderId, orderController.cancelOrder);
 router.get('/:id', validateOrderId, orderController.getOrderById);
 
 module.exports = router;

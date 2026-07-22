@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { FiArrowLeft } from 'react-icons/fi';
+import { FiAlertTriangle, FiArrowLeft, FiX } from 'react-icons/fi';
 import { Link, useParams } from 'react-router-dom';
 
 import Breadcrumbs from '@/components/storefront/Breadcrumbs';
 import Container from '@/components/ui/Container';
 import Loader from '@/components/ui/Loader';
 import { ROUTES } from '@/constants/routes';
-import { getOrderById } from '@/services/order.service';
+import { cancelOrder, getOrderById } from '@/services/order.service';
 import { createReview } from '@/services/review.service';
+import { useToast } from '@/hooks/useToast';
 import { formatPrice } from '@/utils/format';
 
 const TIMELINE = ['PENDING', 'CONFIRMED', 'PREPARING', 'SHIPPED', 'DELIVERED'];
@@ -30,6 +31,23 @@ function OrderDetails() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const { showToast } = useToast();
+
+  async function handleCancel() {
+    setCancelling(true);
+    try {
+      const cancelledOrder = await cancelOrder(id);
+      setOrder(cancelledOrder);
+      setShowCancelDialog(false);
+      showToast('Your order has been cancelled.', 'success');
+    } catch (requestError) {
+      showToast(requestError.message || 'Unable to cancel this order.', 'error');
+    } finally {
+      setCancelling(false);
+    }
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -173,6 +191,12 @@ function OrderDetails() {
               Leave product feedback
             </Link>
           )}
+          {order.status === 'PENDING' && (
+            <button type="button" onClick={() => setShowCancelDialog(true)} className="mt-6 inline-flex items-center gap-2 rounded-full border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50">
+              <FiX aria-hidden="true" />
+              Cancel order
+            </button>
+          )}
           <Link
             to={ROUTES.ORDERS}
             className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-matte-black/62 transition hover:text-champagne-gold"
@@ -182,6 +206,20 @@ function OrderDetails() {
           </Link>
         </aside>
       </div>
+
+      {showCancelDialog && (
+        <div className="fixed inset-0 z-[80] grid place-items-center bg-matte-black/45 p-4" role="presentation">
+          <div className="w-full max-w-md bg-white p-6 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="cancel-order-title">
+            <FiAlertTriangle className="text-xl text-champagne-gold" aria-hidden="true" />
+            <h2 id="cancel-order-title" className="mt-4 font-heading text-2xl text-matte-black">Cancel this order?</h2>
+            <p className="mt-3 text-sm leading-6 text-matte-black/65">This will cancel order {order.orderNumber}. It cannot be undone.</p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button type="button" onClick={() => setShowCancelDialog(false)} disabled={cancelling} className="rounded-full px-4 py-2 text-sm font-semibold text-matte-black/65 transition hover:text-matte-black disabled:cursor-not-allowed">Keep order</button>
+              <button type="button" onClick={handleCancel} disabled={cancelling} className="rounded-full bg-red-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-60">{cancelling ? 'Cancelling...' : 'Cancel order'}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </Container>
   );
 }
