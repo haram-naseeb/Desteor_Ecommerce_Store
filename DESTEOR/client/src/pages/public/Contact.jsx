@@ -79,7 +79,7 @@ const socialLinks = [
   {
     label: 'Facebook',
     handle: 'DESTEOR',
-    href: 'https://facebook.com/desteor',
+    href: 'https://www.facebook.com/profile.php?id=61592422882982&ref=PROFILE_EDIT_xav_ig_profile_page_web#',
     icon: FacebookIcon,
   },
 ];
