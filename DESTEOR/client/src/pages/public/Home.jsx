@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import Newsletter from '@/components/storefront/Newsletter';
+import CallToAction from '@/components/storefront/CallToAction';
 import ProductGrid from '@/components/storefront/ProductGrid';
 import SectionHeading from '@/components/storefront/SectionHeading';
 import Button from '@/components/ui/Button';
@@ -12,17 +12,12 @@ import Section from '@/components/ui/Section';
 import { APP_TAGLINE } from '@/constants/app';
 import { ROUTES } from '@/constants/routes';
 import { getCategories } from '@/services/category.service';
-import {
-  getBestSellerProducts,
-  getFeaturedProducts,
-} from '@/services/product.service';
+import { getFeaturedProducts } from '@/services/product.service';
 import mainImage from '@/assets/main.jpg';
 
 function Home() {
   const [categories, setCategories] = useState([]);
-  
   const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [bestSellers, setBestSellers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -31,16 +26,14 @@ function Home() {
 
     async function loadStorefront() {
       try {
-        const [categoryData, featuredData, bestSellerData] = await Promise.all([
+        const [categoryData, featuredData] = await Promise.all([
           getCategories(),
-          getFeaturedProducts(4),
-          getBestSellerProducts(4),
+          getFeaturedProducts(10),
         ]);
 
         if (!isMounted) return;
         setCategories(categoryData);
         setFeaturedProducts(featuredData);
-        setBestSellers(bestSellerData);
       } catch (requestError) {
         if (isMounted) {
           setError(requestError.message || 'Unable to load storefront products.');
@@ -118,9 +111,9 @@ function Home() {
           )}
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <SectionHeading
-              eyebrow="Featured"
-              title="Curated for the ceremony"
-              description="Database-backed selections chosen for polish, proportion, and bridal presence."
+              eyebrow="Featured Collection"
+              title="Handpicked for Every Occasion"
+              description="Discover our most loved artificial jewellery, carefully selected for style, elegance, and everyday luxury."
             />
             <Link to={ROUTES.SHOP} className="text-sm font-semibold uppercase tracking-[0.22em] text-matte-black hover:text-champagne-gold">
               View all
@@ -128,24 +121,6 @@ function Home() {
           </div>
           <div className="mt-10">
             <ProductGrid products={featuredProducts} />
-          </div>
-        </Container>
-      </Section>
-
-      <Section className="bg-white">
-        <Container>
-          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-            <SectionHeading
-              eyebrow="Best Sellers"
-              title="Most requested pieces"
-              description="Customer favourites with a balance of ceremony detail and repeat styling."
-            />
-            <Link to={`${ROUTES.SHOP}?sort=featured`} className="text-sm font-semibold uppercase tracking-[0.22em] text-matte-black hover:text-champagne-gold">
-              View all
-            </Link>
-          </div>
-          <div className="mt-10">
-            <ProductGrid products={bestSellers} />
           </div>
         </Container>
       </Section>
@@ -182,7 +157,7 @@ function Home() {
         </Container>
       </Section>
 
-      <Newsletter />
+      <CallToAction />
     </>
   );
 }

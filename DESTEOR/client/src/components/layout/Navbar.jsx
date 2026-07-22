@@ -47,7 +47,6 @@ function Navbar() {
     ? [
         { label: 'Profile', to: ROUTES.PROFILE, icon: User },
         { label: 'Orders', to: ROUTES.ORDERS, icon: Package },
-        { label: 'Wishlist', to: ROUTES.WISHLIST, icon: Heart },
         { label: 'About', to: ROUTES.ABOUT, icon: Info },
         { label: 'Contact', to: ROUTES.CONTACT, icon: Mail },
       ]
@@ -218,7 +217,7 @@ function Navbar() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.98 }}
                       transition={{ duration: 0.18 }}
-                      className="absolute right-0 top-full mt-3 w-64 overflow-hidden rounded-2xl border border-matte-black/10 bg-ivory-white/98 p-2 shadow-glow backdrop-blur-sm"
+                      className="absolute right-0 top-full mt-3 w-64 overflow-hidden rounded-2xl border border-matte-black/10 bg-white p-2 shadow-2xl"
                     >
                       <div className="px-3 py-2">
                         <p className="text-xs uppercase tracking-[0.24em] text-champagne-gold">
